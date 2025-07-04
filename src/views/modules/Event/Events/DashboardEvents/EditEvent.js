@@ -57,7 +57,6 @@ const EditEvent = () => {
     const [endTime, setEndTime] = useState('');
     const [mapCode, setMapCode] = useState('');
     const [thumbnail, setThumbnail] = useState('');
-    const [idCard, setIdCard] = useState('');
     const [youtubeUrl, setYoutubeUrl] = useState('');
     const [images, setImages] = useState([]);
     const [imagepreview, setImagepreview] = useState([]);
@@ -165,7 +164,6 @@ const EditEvent = () => {
                     setMapCode(event?.map_code);
                 }
                 setThumbnail(event?.thumbnail);
-                setIdCard(event?.card_url);
                 setYoutubeUrl(event?.youtube_url);
                 setImages(event?.images ? JSON.parse(event?.images) : []);
 
@@ -548,8 +546,6 @@ const EditEvent = () => {
                                     setInstaThumb={setInstaThumb}
 
                                     setThumbnail={setThumbnail}
-                                    idCard={idCard}
-                                    setIdCard={setIdCard}
                                     setImagepreview={setImagepreview}
                                     validated={validated}
                                     setImages={setImages}
