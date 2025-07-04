@@ -13,6 +13,8 @@ const MediaFieldset = ({
     youtubeUrl,
     loading,
     setThumbnail,
+    setIdCard,
+    idCard,
     setYoutubeUrl,
     show,
     setImagepreview,
@@ -206,6 +208,32 @@ const MediaFieldset = ({
                                         />
                                     </div>
                                 </Col>
+                                <Col lg="12">
+                                    <Form.Group className="mb-3 form-group d-flex align-items-center gap-3">
+                                        <div className="flex-grow-1">
+                                            <Form.Label>ID Card : (282 × 260 px)</Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={(e) => setIdCard(e.target.files[0])}
+                                            />
+                                        </div>
+                                        {idCard && (
+                                            <div>
+                                                <img
+                                                    src={
+                                                        typeof idCard === 'string'
+                                                            ? idCard
+                                                            : URL.createObjectURL(idCard)
+                                                    }
+                                                    alt="ID Card Preview"
+                                                    style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 4 }}
+                                                />
+                                            </div>
+                                        )}
+                                    </Form.Group>
+                                </Col>
+
                                 <Col md='12'>
                                     <div className="form-group">
                                         <label className="form-label">Instagram URL (Optional):</label>
