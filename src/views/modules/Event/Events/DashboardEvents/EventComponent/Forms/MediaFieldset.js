@@ -234,6 +234,7 @@ const MediaFieldset = ({
                                     </Form.Group>
                                 </Col>
 
+
                                 <Col md='12'>
                                     <div className="form-group">
                                         <label className="form-label">Instagram URL (Optional):</label>
