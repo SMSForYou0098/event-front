@@ -1,0 +1,87 @@
+/* Override default slick styles to remove extra whitespace */
+.slick-banner {
+    line-height: 0;
+}
+
+.slick-slider {
+    margin-bottom: 0 !important;
+}
+
+.slider-item {
+    line-height: 0;
+}
+
+.banner-slider-inner {
+    line-height: 0;
+}
+
+/* Fix dots positioning */
+.slick-dots {
+    bottom: 10px !important;
+    z-index: 1;
+}
+
+/* Remove any extra margin on slide items */
+.slick-slide {
+    margin: 0;
+    padding: 0;
+    line-height: 0;
+}
+
+/* Ensure images are displayed properly */
+.slick-slide img {
+    display: block;
+    line-height: 0;
+}
+
+/* Remove any padding that might cause whitespace */
+.slick-list {
+    margin: 0;
+    padding: 0 !important;
+}
+
+.slick-track {
+    margin: 0;
+}
+
+/* Ensure container has no extra space */
+.slick-slider .slick-list,
+.slick-slider .slick-track {
+    transform: translate3d(0, 0, 0);
+}
+
+/* Fix for draggable banners */
+.slick-track {
+    display: flex;
+    align-items: center;
+    will-change: transform;
+    touch-action: pan-y;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+}
+
+.slick-slide {
+    pointer-events: auto;
+    touch-action: pan-y;
+    will-change: transform;
+    transition: transform 0.3s ease;
+}
+
+.slick-list {
+    overflow: visible !important;
+}
+
+.slider-item a {
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Prevent banner image from stretching */
+.slider-item .video-box {
+    width: 100%;
+    background-size: cover !important;
+    transform: translateZ(0);
+}
