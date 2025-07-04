@@ -1,14 +1,18 @@
 import React, { memo, Fragment, useState, useEffect, useCallback, useMemo } from "react";
-import { Row, Col, Card, Image, } from "react-bootstrap";
+import { Row, Image, Button, } from "react-bootstrap";
 import axios from "axios";
 import { useMyContext } from "../../../../Context/MyContextProvider";
-import CustomDataTable from "../Wallet/CustomDataTable";
 import { CustomTooltip } from "../CustomUtils/CustomTooltip";
+import CommonListing from "../CustomUtils/CommonListing";
+import { Edit, Eye, IdCard, Trash2 } from "lucide-react";
+import TicketModal from "../TicketModal/TicketModal";
 
 const Attendees = memo(() => {
-  const { api, successAlert, authToken, UserData } = useMyContext();
+  const { api, successAlert, formatDateRange, convertTo12HourFormat, isMobile, authToken, UserData } = useMyContext();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [ticketData, setTicketData] = useState({});
+  const [ticketModal, setTicketModal] = useState(false);
 
   const GetAttendee = useCallback(async () => {
     try {
@@ -38,6 +42,20 @@ const Attendees = memo(() => {
 
   const openLightbox = useCallback((imagePath) => {
     setSelectedImage(imagePath);
+  }, []);
+
+  const handleShowIdCardModal = useCallback((data) => {
+    console.log(data)
+    setTicketData(data);
+    setTicketModal(true);
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setTicketModal(false);
+    setTimeout(() => {
+      setSelectedImage("");
+      setTicketData({});
+    }, 1000);
   }, []);
 
   const columns = useMemo(() => [
@@ -85,7 +103,7 @@ const Attendees = memo(() => {
                       height: '50px',
                       borderRadius: '50%',
                       objectFit: 'cover'
-                    }}/>
+                    }} />
                 </div>
               </CustomTooltip>
             </div>
@@ -95,8 +113,64 @@ const Attendees = memo(() => {
       },
       headerAlign: 'center',
       align: 'center'
+    },
+    {
+      dataField: "action",
+      text: "Action",
+      formatter: (cell, row) => {
+        const actions = [
+          {
+            tooltip: "Generate ID Card",
+            icon: <IdCard size={16} />,
+            onClick: () => handleShowIdCardModal(row),
+            variant: "secondary",
+            // isDisabled: row?.status !== 1 || parseInt(row.approval_status) !== 1,
+            visible: true,
+          },
+          {
+            tooltip: "Preview User",
+            icon: <Eye size={16} />,
+            // onClick: () => handlePreview(row.id),
+            variant: "info",
+            visible: true,
+          },
+          {
+            tooltip: "Manage User",
+            icon: <Edit size={16} />,
+            // onClick: () => AssignCredit(row.id),
+            variant: "primary",
+            visible: true,
+          },
+          {
+            tooltip: "Delete User",
+            icon: <Trash2 size={16} />,
+            // onClick: () => HandleDelete(row.id),
+            variant: "danger",
+            visible: true,
+          },
+        ];
+
+        return (
+          <div className="d-flex gap-2 justify-content-center">
+            {actions
+              .filter((a) => a.visible)
+              .map((action, idx) => (
+                <CustomTooltip key={idx} text={action.tooltip}>
+                  <Button
+                    variant={action.variant}
+                    className="btn-sm btn-icon"
+                    onClick={action.onClick}
+                    disabled={action?.isDisabled}
+                  >
+                    {action.icon}
+                  </Button>
+                </CustomTooltip>
+              ))}
+          </div>
+        );
+      },
     }
-  ], [openLightbox]);
+  ], [openLightbox, handleShowIdCardModal]);
 
 
 
@@ -133,24 +207,30 @@ const Attendees = memo(() => {
             />
           </div>
         )}
-        <Col sm="12">
-          <Card>
-            <Card.Header className="d-flex justify-content-between">
-              <div className="header-title">
-                <h4 className="card-title">Attendees</h4>
-              </div>
-            </Card.Header>
-            <Card.Body className="px-0">
-              <CustomDataTable
-                data={users}
-                columns={columns}
-                loading={loading}
-                keyField="id"
-                searchPlaceholder="Search attendees..."
-              />
-            </Card.Body>
-          </Card>
-        </Col>
+        <TicketModal
+          show={ticketModal}
+          handleCloseModal={handleCloseModal}
+          ticketType={{ type: 'combine' }}
+          ticketData={ticketData}
+          ticketRefs={[]}
+          loading={loading}
+          isIdCard={true}
+          showTicketDetails={true}
+          showPrintButton={true}
+          // downloadTicket={downloadTicket}
+          isMobile={isMobile}
+          formatDateRange={formatDateRange}
+          convertTo12HourFormat={convertTo12HourFormat}
+        />
+        <CommonListing
+          tile={'Attendees'}
+          bookings={users}
+          exportPermisson={'Export Attendees'}
+          loading={loading}
+          columns={columns}
+          ShowReportCard={false}
+          searchPlaceholder={"Search Attendees..."}
+        />
       </Row>
     </Fragment>
   );

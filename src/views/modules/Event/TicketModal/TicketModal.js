@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Row, Col } from 'react-bootstrap';
 import TicketCanvas from '../Events/Tickets/Ticket_canvas';
 import { FaTimes } from 'react-icons/fa';
@@ -7,9 +7,13 @@ import { useMyContext } from '../../../../Context/MyContextProvider';
 import AmusementTicket from '../Events/Tickets/AmusementTicket';
 import AccreditationTicket from '../Events/Tickets/AccreditationTicket';
 import TicketCanvasBatch from '../Events/Tickets/TicketCanvasBatch';
+import IdCard from '../Events/Tickets/IdCard';
+import axios from 'axios';
 const TicketModal = (props) => {
-    const { showPrintButton, showTicketDetails, show, handleCloseModal, ticketType, ticketData, formatDateRange, isAccreditation } = props;
-    const { convertTo12HourFormat,isMobile } = useMyContext()
+    const { convertTo12HourFormat, isMobile, api } = useMyContext()
+    const { showPrintButton, showTicketDetails, show, handleCloseModal, ticketType, ticketData, formatDateRange, isAccreditation, isIdCard } = props;
+
+    const [userPhoto, setUserPhoto] = useState();
 
     const RetriveName = (data) => {
         return data?.attendee?.Name ||
@@ -23,6 +27,7 @@ const TicketModal = (props) => {
             data?.bookings?.[0]?.attendee ||
             data?.user ||
             data?.bookings?.[0]?.user ||
+            data ||
             'N/A';
     };
     const RetriveNumber = (data) => {
@@ -35,7 +40,36 @@ const TicketModal = (props) => {
     const category = ticketData?.ticket?.event?.category || (ticketData?.bookings && ticketData?.bookings[0]?.ticket?.event?.category)
     const isAmusementTicket = category === 18
 
-    const Ticket = isAmusementTicket ? AmusementTicket : isAccreditation ? AccreditationTicket : TicketCanvas
+    const getTicketComponent = () => {
+        if (isIdCard) return IdCard;
+        if (isAmusementTicket) return AmusementTicket;
+        if (isAccreditation) return AccreditationTicket;
+        return TicketCanvas;
+    };
+
+    const Ticket = getTicketComponent();
+
+    const fetchImage = async (bg, setBg) => {
+        try {
+            const response = await axios.post(
+                `${api}get-image/retrive`,
+                { path: bg },
+                { responseType: 'blob' }
+            );
+            const imageUrl = URL.createObjectURL(response.data);
+            setBg(imageUrl);
+        } catch (error) {
+            console.error('Image fetch error:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (isIdCard && ticketData) {
+            if (ticketData?.Photo) {
+                fetchImage(ticketData?.Photo, setUserPhoto);
+            }
+        }
+    }, [ticketData, api]);
 
     return (
         <Modal show={show} onHide={() => handleCloseModal()} size={ticketType?.type === 'zip' ? 'xl' : ''}>
@@ -103,6 +137,7 @@ const TicketModal = (props) => {
                                     <div>
                                         {/* Safely extract data with fallback values */}
                                         <Ticket
+                                            userPhoto={userPhoto}
                                             showDetails={showTicketDetails}
                                             showPrintButton={showPrintButton}
                                             number={RetriveNumber(ticketData)}

@@ -39,6 +39,7 @@ const CheckOutData = (props) => {
                         />
                         :
                         <BookingTickets
+                            event={event}
                             tickets={tickets}
                             bookingdate={bookingdate}
                             error={error}

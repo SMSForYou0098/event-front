@@ -29,7 +29,6 @@ const TicketCanvas = (props) => {
   };
 
   useEffect(() => {
-    console.log(showDetails)
     if (ticketBG) {
       fetchImage();
     }
