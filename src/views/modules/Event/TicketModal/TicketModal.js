@@ -11,9 +11,10 @@ import IdCard from '../Events/Tickets/IdCard';
 import axios from 'axios';
 const TicketModal = (props) => {
     const { convertTo12HourFormat, isMobile, api } = useMyContext()
-    const { showPrintButton, showTicketDetails, show, handleCloseModal, ticketType, ticketData, formatDateRange, isAccreditation, isIdCard } = props;
+    const { showPrintButton, showTicketDetails, show, handleCloseModal, ticketType, ticketData, formatDateRange, isAccreditation, isIdCard, card_url, bgRequired } = props;
 
     const [userPhoto, setUserPhoto] = useState();
+    const [idCardBg, setIdCardBg] = useState();
 
     const RetriveName = (data) => {
         return data?.attendee?.Name ||
@@ -64,12 +65,16 @@ const TicketModal = (props) => {
     };
 
     useEffect(() => {
-        if (isIdCard && ticketData) {
-            if (ticketData?.Photo) {
-                fetchImage(ticketData?.Photo, setUserPhoto);
-            }
+    if (show && isIdCard) {
+        if (ticketData?.Photo) {
+            fetchImage(ticketData.Photo, setUserPhoto);
         }
-    }, [ticketData, api]);
+
+        if (bgRequired && card_url) {
+            fetchImage(card_url, setIdCardBg);
+        }
+    }
+}, [show, ticketData, card_url, bgRequired, isIdCard]);
 
     return (
         <Modal show={show} onHide={() => handleCloseModal()} size={ticketType?.type === 'zip' ? 'xl' : ''}>
@@ -121,6 +126,8 @@ const TicketModal = (props) => {
                                                                 time={convertTo12HourFormat(event.start_time) || 'Time Not Set'}
                                                                 OrderId={item?.order_id || item?.token || 'N/A'}
                                                                 quantity={1}
+                                                                idCardBg={idCardBg}
+                                                                bgRequired={bgRequired}
                                                             />
                                                         </div>
                                                         <p className="text-center text-secondary">{index + 1}</p>
@@ -194,6 +201,8 @@ const TicketModal = (props) => {
                                             }
                                             OrderId={ticketData?.order_id || ticketData?.token || 'N/A'}
                                             quantity={ticketData?.bookings?.length || 1}
+                                            idCardBg={idCardBg}
+                                            bgRequired={bgRequired}
                                         />
                                     </div>
                                 </Col>

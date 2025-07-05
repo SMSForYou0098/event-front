@@ -1,10 +1,19 @@
 import React, { useEffect, useRef, useState } from "react";
 import { fabric } from "fabric-pure-browser";
 import { QRCodeCanvas } from "qrcode.react";
-import { Button, Col, Row, Spinner } from "react-bootstrap";
+import { Button, Col, Placeholder, Row, Spinner } from "react-bootstrap";
 import { ArrowBigDownDash, Printer } from "lucide-react";
 const IdCard = (props) => {
-  const { showDetails, user, OrderId, showPrintButton, userPhoto } = props;
+  const {
+    showDetails,
+    user,
+    OrderId,
+    showPrintButton,
+    userPhoto,
+    idCardBg,
+    bgRequired,
+    imageLoading,
+  } = props;
   const canvasRef = useRef(null);
   const qrCodeRef = useRef(null);
   const [loading, setLoading] = useState(false);
@@ -22,11 +31,15 @@ const IdCard = (props) => {
     });
     return tempText.width;
   };
+
+  // Inside your component...
+
   useEffect(() => {
+    if (!idCardBg) return; // Don’t draw until bg is ready
+
     const canvas = new fabric.Canvas(canvasRef.current);
     setFabricCanvas(canvas);
 
-    // Set fixed canvas dimensions with transparent background
     canvas.setDimensions({ width: CANVAS_WIDTH, height: CANVAS_HEIGHT });
     canvas.backgroundColor = "transparent";
 
@@ -47,17 +60,46 @@ const IdCard = (props) => {
 
       canvas.add(textObject);
       canvas.renderAll();
-
       return textObject;
     };
 
     const drawCanvas = () => {
-      // Clear canvas
       canvas.clear();
-      canvas.backgroundColor = 'transparent';
-    //   canvas.backgroundColor = "blue";
 
-      // Always show QR code
+      // ✅ Now idCardBg is guaranteed to be defined
+      // Clear any existing background image
+      canvas.setBackgroundImage(null, () => {
+        canvas.renderAll();
+      });
+
+      // Conditionally load background only if bgRequired is true and idCardBg is set
+      if (bgRequired && idCardBg) {
+        fabric.Image.fromURL(
+          idCardBg,
+          (bgImg) => {
+            bgImg.set({
+              left: 0,
+              top: 0,
+              scaleX: CANVAS_WIDTH / bgImg.width,
+              scaleY: CANVAS_HEIGHT / bgImg.height,
+              selectable: false,
+              evented: false,
+            });
+
+            canvas.setBackgroundImage(bgImg, () => {
+              canvas.renderAll();
+            });
+          },
+          { crossOrigin: "anonymous" }
+        );
+      } else {
+        // Fallback: use transparent background (default)
+        canvas.backgroundColor = "transparent";
+        canvas.renderAll();
+      }
+
+      // other rendering logic here...
+
       const qrCodeCanvas = qrCodeRef.current;
 
       // Show profile image
@@ -141,7 +183,27 @@ const IdCard = (props) => {
     return () => {
       canvas.dispose();
     };
-  }, [OrderId, user, showDetails, userPhoto]);
+  }, [OrderId, user, showDetails, userPhoto, idCardBg]); // ✅ add idCardBg here
+  if (!idCardBg) {
+    return (
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: 321 }}
+      >
+        <Placeholder as="div" animation="glow">
+          <Placeholder
+            xs={12}
+            style={{
+              width: 204,
+              height: 321,
+              borderRadius: "8px",
+              backgroundColor: "#000000",
+            }}
+          />
+        </Placeholder>
+      </div>
+    );
+  }
 
   const upscaleCanvas = async (canvas, preferredMultiplier = 15) => {
     let dataURL = null;
@@ -200,40 +262,36 @@ const IdCard = (props) => {
 
   // Download functionality with true 4K quality using Fabric.js multiplier
   const downloadCanvas = async () => {
-    setLoading(true);
-    try {
-      if (!fabricCanvas) {
-        throw new Error("Canvas not found");
-      }
+  if (!fabricCanvas) {
+    alert("Canvas not initialized yet.");
+    return;
+  }
 
-      // Use upscale function with 15x preferred multiplier for 4K download
-      const { dataURL, actualMultiplier } = await upscaleCanvas(fabricCanvas, 15);
+  setLoading(true);
+  try {
+    // Generate high-quality image
+    const { dataURL, actualMultiplier } = await upscaleCanvas(fabricCanvas, 15); // consider reducing to 10
 
-      // Create and trigger download - safer approach without DOM manipulation
-      const link = document.createElement("a");
-      link.href = dataURL;
-      const qualityLabel =
-        actualMultiplier >= 10
-          ? "4k"
-          : actualMultiplier >= 6
-          ? "hd"
-          : "standard";
-      link.download = `ticket_${qualityLabel}_${
-        OrderId || user?.Name?.replace(/\s+/g, "_") || "event"
-      }.png`;
-      
-      // Trigger download without adding to DOM
-      link.style.display = 'none';
-      link.click();
+    const safeName = (user?.Name || "event")
+      .replace(/[^a-z0-9]/gi, "_")
+      .toLowerCase();
+    const qualityLabel = actualMultiplier >= 10 ? "4k" : actualMultiplier >= 6 ? "hd" : "standard";
 
-      console.log(`Downloaded at ${actualMultiplier}x quality (${qualityLabel})`);
-    } catch (err) {
-      console.error("Download error:", err);
-      alert("Download failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const link = document.createElement("a");
+    link.href = dataURL;
+    link.download = `ticket_${qualityLabel}_${OrderId || safeName}.png`;
+    link.style.display = "none";
+    link.click();
+
+    console.log("✅ Downloaded successfully");
+  } catch (err) {
+    console.error("❌ Download error:", err);
+    alert("Download failed.");
+  } finally {
+    setLoading(false);
+  }
+};
+
   const printCanvas = async () => {
     setLoading(true);
     try {
@@ -242,7 +300,10 @@ const IdCard = (props) => {
       }
 
       // Use upscale function with 10x preferred multiplier for high-quality print
-      const { dataURL, actualMultiplier } = await upscaleCanvas(fabricCanvas, 10);
+      const { dataURL, actualMultiplier } = await upscaleCanvas(
+        fabricCanvas,
+        10
+      );
 
       // Create a new window for printing
       const printWindow = window.open("", "", "width=800,height=600");
@@ -257,9 +318,9 @@ const IdCard = (props) => {
         printWindow.document.body.style.textAlign = "center";
         printWindow.document.body.style.margin = "0";
         printWindow.document.body.style.padding = "0";
-        
+
         // Set print styles for high quality
-        const style = printWindow.document.createElement('style');
+        const style = printWindow.document.createElement("style");
         style.textContent = `
           @media print {
             body { margin: 0; padding: 0; }
@@ -267,7 +328,7 @@ const IdCard = (props) => {
           }
         `;
         printWindow.document.head.appendChild(style);
-        
+
         console.log(`Printing at ${actualMultiplier}x quality`);
         printWindow.print();
         printWindow.close();
@@ -313,10 +374,18 @@ const IdCard = (props) => {
           </Spinner>
         </div>
       ) : (
-        <div
-          style={{ display: "flex", justifyContent: "center", width: "100%" }}
-        >
-          <canvas ref={canvasRef} />
+        <div className="d-flex justify-content-center align-items-center w-100 my-3">
+          <div
+            style={{
+              border: "1px solid #ddd",
+              boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+              display: "inline-block",
+              borderRadius: "12px",
+              overflow: "hidden",
+            }}
+          >
+            <canvas ref={canvasRef} style={{ display: "block" }} />
+          </div>
         </div>
       )}
       <div style={{ display: "none" }}>
