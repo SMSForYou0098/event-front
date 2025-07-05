@@ -143,6 +143,7 @@ const CanvasSettings = ({
       return;
     }
 
+    
     const fetchImages = async () => {
         console.log("Fetching images for previewUrl:", imgsrc);
       await Promise.all([
