@@ -19,13 +19,14 @@ const IDCardDragAndDrop = ({
   isCircle = false,
   download = false,
   print = false,
-  animate = true,
+  animate = false,
   setLayoutData,
   setShowSettingsModal,
   categoryId,
   fetchingLayout,
   savedLayout
 }) => {
+  console.log('uuu',userData)
   const canvasRef = useRef(null);
   const qrCodeRef = useRef(null);
   const historyRef = useRef([]);
@@ -38,6 +39,7 @@ const IDCardDragAndDrop = ({
   const [showIntroAnimation, setShowIntroAnimation] = useState(animate);
   const [animationComplete, setAnimationComplete] = useState(!animate);
   const { authToken, ErrorAlert, api } = useMyContext();
+  
   // Fetch layout from API
 
   const saveLayoutToBackend = async (layoutData) => {

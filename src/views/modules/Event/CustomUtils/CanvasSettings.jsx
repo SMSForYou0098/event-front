@@ -65,11 +65,11 @@ const CanvasSettings = ({
   isCircle,
   setIsCircle,
   disabled,
+  savedLayout,
 }) => {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const { api, authToken } = useMyContext();
   const [finalImage, setFinalImage] = useState(null);
-  const [savedLayout, setSavedLayout] = useState();
   const [fetchingLayout, setFetchingLayout] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -130,7 +130,7 @@ const CanvasSettings = ({
 
   useEffect(() => {
     setLoading(true);
-    if(!previewUrl) {
+        if(!previewUrl) {
       setFinalImage(null);
         setLoading(false);
         return;
@@ -143,7 +143,6 @@ const CanvasSettings = ({
       return;
     }
 
-    
     const fetchImages = async () => {
         console.log("Fetching images for previewUrl:", imgsrc);
       await Promise.all([

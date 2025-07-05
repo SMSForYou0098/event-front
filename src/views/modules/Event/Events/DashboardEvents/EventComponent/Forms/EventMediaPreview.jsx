@@ -49,7 +49,7 @@ export const PhotosGallary = (props) => {
 };
 
 const EventMediaPreview = (props) => {
-  const { idCard, instaThumb, layoutImagePreview } = props;
+  const { idCard, instaThumb, layoutImagePreview, savedLayout } = props;
     const { setLayoutData, isCircle, setIsCircle, categoryId, imageLoading } = props;
 
   const textAnimationProps = {
@@ -137,6 +137,7 @@ const EventMediaPreview = (props) => {
           setIsCircle={setIsCircle}
           categoryId={categoryId}
           disabled={imageLoading}
+          savedLayout={savedLayout}
         />
         {renderIdCardPlaceholder(idCard)}
       </Col>

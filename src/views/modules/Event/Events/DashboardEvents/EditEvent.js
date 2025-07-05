@@ -93,6 +93,9 @@ const EditEvent = () => {
     const [layoutImage, setLayoutImage] = useState("");
     const [layoutImagePreview, setLayoutImagePreview] = useState("");
 
+    // saving layout data
+    const [layoutData, setLayoutData] = useState({});
+
     useEffect(() => {
         const fetchCategoryData = async () => {
             try {
@@ -174,6 +177,20 @@ const EditEvent = () => {
                 setMetaDescription(event.meta_description || '');
                 setKeywords(event.meta_keyword || '');
                 setMetaTag(event.meta_tag || '');
+
+                const parsed = event.event_layout || {};
+
+          const transformedLayout = {
+            userPhoto: JSON.parse(parsed.user_photo || "{}"),
+            textValue_0: JSON.parse(parsed.text_1 || "{}"),
+            textValue_1: JSON.parse(parsed.text_2 || "{}"),
+            textValue_2: JSON.parse(parsed.text_3 || "{}"),
+            qrCode: JSON.parse(parsed.qr_code || "{}"),
+            zoneGroup: JSON.parse(parsed.zones || "{}"),
+          };
+
+          setLayoutData(transformedLayout);
+          setIsCircle(transformedLayout.userPhoto?.isCircle || false);
             }
         }).catch((err) =>
             console.log(err)
@@ -199,6 +216,8 @@ const EditEvent = () => {
                 });
         }
     }, [state?.value, country?.value]);
+
+    console.log('Layout Data:', layoutData)
 
 
     useEffect(() => {
@@ -381,6 +400,9 @@ const EditEvent = () => {
                 formData.append('insta_url', instaUrl);
                 formData.append('insta_thumb', instaThumb);
                 formData.append('card_url', idCard);
+                formData.append("layout", JSON.stringify(layoutData));
+
+
                 if (images.length > 0) {
                     formData.append('images_1', images[0]);
                     formData.append('images_2', images[1]);
@@ -568,6 +590,8 @@ const EditEvent = () => {
                                     show={show}
                                     isCircle={isCircle}
                                     setIsCircle={setIsCircle}
+                                    setLayoutData={setLayoutData}
+                                    savedLayout={layoutData}
                                 />
                                 <PublishFieldset
                                     metaTitle={metaTitle}

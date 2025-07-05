@@ -30,7 +30,9 @@ const MediaFieldset = ({
     instaThumb,
     setInstaThumb,
     setIsCircle,
-    isCircle
+    isCircle,
+    setLayoutData,
+    savedLayout
 }) => {
 
     const { ErrorAlert } = useMyContext();
@@ -223,6 +225,8 @@ const MediaFieldset = ({
                                             layoutImagePreview={layoutImagePreview}
                                             setIsCircle={setIsCircle}
                                             isCircle={isCircle}
+                                            setLayoutData={setLayoutData}
+                                            savedLayout={savedLayout}
                                         />
                                     </Col>
                                 </Row>
