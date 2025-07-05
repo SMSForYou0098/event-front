@@ -29,6 +29,8 @@ const MediaFieldset = ({
     setInstaUrl,
     instaThumb,
     setInstaThumb,
+    setIsCircle,
+    isCircle
 }) => {
 
     const { ErrorAlert } = useMyContext();
@@ -219,6 +221,8 @@ const MediaFieldset = ({
                                             idCard={idCard}
                                             instaThumb={instaThumb}
                                             layoutImagePreview={layoutImagePreview}
+                                            setIsCircle={setIsCircle}
+                                            isCircle={isCircle}
                                         />
                                     </Col>
                                 </Row>
@@ -240,6 +244,8 @@ const MediaFieldset = ({
                                         setImagepreview={setImagepreview}
                                         setImages={setImages}
                                         images={images}
+                                        setIsCircle={setIsCircle}
+                                        isCircle={isCircle}
                                     />
                                 </Col>
                             </Col>
