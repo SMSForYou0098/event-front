@@ -4,7 +4,7 @@ import { Dashboard, Tus, Uppy } from "uppy";
 import { useMyContext } from '../../../../../../../Context/MyContextProvider';
 import { X } from 'lucide-react';
 import { processImageFile } from '../../../../CustomComponents/AttendeeStroreUtils';
-
+import { motion, AnimatePresence } from "framer-motion";
 
 const MediaFieldset = ({
     validated,
@@ -106,7 +106,7 @@ const MediaFieldset = ({
     const handleInstaThumbChange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-    
+
         try {
             const compressed = await processImageFile(file);
             if (compressed) {
@@ -127,6 +127,37 @@ const MediaFieldset = ({
             setLayoutImagePreview(URL.createObjectURL(file));
         }
     };
+
+    const textAnimationProps = {
+        initial: { opacity: 0, y: 10 },
+        animate: { opacity: 1, y: 0 },
+        transition: { delay: 0.2, duration: 0.3 },
+    };
+    const renderPlaceholder = () => (
+        <div
+            className="d-flex flex-column justify-content-center align-items-center text-muted"
+            style={{
+                border: "2px dashed var(--bs-secondary)",
+                borderRadius: "8px",
+                fontSize: "14px",
+                textAlign: "center",
+                padding: "10px",
+                width: `204px`,
+                height: `321px`,
+                overflow: "hidden",
+            }}
+        >
+            <motion.div {...textAnimationProps}>
+                No file selected
+                <br />
+                <small>
+                    Expected size: 321×204px
+                </small>
+                <br />
+                <small>ID Card Preview</small>
+            </motion.div>
+        </div>
+    );
     return (
         <fieldset className={`${show === "Media" ? "d-block" : "d-none"}`}>
             <Form validated={validated} onSubmit={(e) => UpdateEvent(e)} className="needs-validation" noValidate>
@@ -145,149 +176,153 @@ const MediaFieldset = ({
                                 </Button>
                             </div>
                         </div>
-                        <div className="col-md-6">
-                            <Form.Group className="mb-3 form-group">
-                                <Form.Label className="custom-file-input">Thumbnail Image</Form.Label>
-                                <div className="file-uploader"></div>
-                                <span>Upload 16:9 ratio thumbnail image of atleast 600x725 px (jpg/jpeg/png)</span>
-                            </Form.Group>
-                        </div>
-                        <div className="col-md-6">
-                            <Row>
-                                {imagepreview.map((preview, index) => (
-                                    <Col xs={3} sm={3} md={3} lg={3} key={index}>
-                                        <Card className="position-relative">
-                                            <Card.Body className="p-2">
-                                                <div className="position-relative" style={{ width: "100%", paddingTop: "100%" }}>
-                                                    <Image
-                                                        src={preview || "/placeholder.svg"}
-                                                        alt={`Image ${index + 1}`}
-                                                        className="position-absolute top-0 start-0 w-100 h-100 object-cover rounded"
+                        <Row className=''>
+                            <div className="col-md-5">
+                                <Form.Group className="mb-3 form-group">
+                                    <Form.Label className="custom-file-input">Thumbnail Image</Form.Label>
+                                    <div className="file-uploader"></div>
+                                    <span>Upload 16:9 ratio thumbnail image of atleast 600x725 px (jpg/jpeg/png)</span>
+                                </Form.Group>
+                            </div>
+                            <div className="col-md-7">
+                                <Row className='align-items-center'>
+                                    <Col lg="6">
+                                        <Row>
+                                            {/* col 12 */}
+                                            <Col xs={12} className="mb-3">
+                                                <Form.Group className="mb-3 form-group d-flex align-items-center gap-3">
+                                                    <div className="flex-grow-1">
+                                                        <Form.Label>ID Card : (321 × 204 px)</Form.Label>
+                                                        <Form.Control
+                                                            type="file"
+                                                            accept="image/*"
+                                                            onChange={(e) => setIdCard(e.target.files[0])}
+                                                        />
+                                                    </div>
+                                                    {idCard && (
+                                                        <div>
+                                                            <img
+                                                                src={
+                                                                    typeof idCard === 'string'
+                                                                        ? idCard
+                                                                        : URL.createObjectURL(idCard)
+                                                                }
+                                                                alt="ID Card Preview"
+                                                                style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 4 }}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </Form.Group>
+                                            </Col>
+                                            <Col md='12'>
+                                                <div className="form-group">
+                                                    <label className="form-label">YouTube Video URL (Optional): *</label>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        name="yt"
+                                                        value={youtubeUrl}
+                                                        placeholder="https://www.youtube.com/watch?v=Zjq1zRWpcgs"
+                                                        onChange={(e) => setYoutubeUrl(e.target.value)}
                                                     />
-                                                    <Button
-                                                        variant="danger"
-                                                        size="sm"
-                                                        className="position-absolute top-0 end-0 p-1"
-                                                        style={{ transform: "translate(50%, -50%)", borderRadius: "50%" }}
-                                                        onClick={() => removeImage(index)}
-                                                    >
-                                                        <X size={12} />
-                                                    </Button>
                                                 </div>
-                                            </Card.Body>
-                                        </Card>
-                                    </Col>
-                                ))}
-                                {/* Show upload button if less than 4 images */}
-                                {imagepreview.length < 4 && (
-                                    <Col xs={3} sm={3} md={3} lg={3} >
-                                        <Card className="d-flex align-items-center justify-content-center">
-                                            <Card.Body className="p-2">
-                                                <Form.Group controlId="image-upload">
-                                                    <Form.Label>Upload Image</Form.Label>
+                                            </Col>
+                                            <Col md='12'>
+                                                <div className="form-group">
+                                                    <label className="form-label">Instagram URL (Optional):</label>
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        name="insta"
+                                                        value={instaUrl}
+                                                        placeholder="https://www.instagram.com/p/xyz123"
+                                                        onChange={(e) => setInstaUrl(e.target.value)}
+                                                    />
+                                                </div>
+                                            </Col>
+                                            <Col md='12'>
+                                                <Form.Group controlId="insta-thumb-upload">
+                                                    <Form.Label>Instagram Thumbnail (Optional)</Form.Label>
                                                     <Form.Control
                                                         type="file"
                                                         accept="image/*"
-                                                        onChange={(e) => handleImageChange(e, imagepreview.length)}
+                                                        onChange={handleInstaThumbChange}
                                                     />
                                                 </Form.Group>
-                                            </Card.Body>
-                                        </Card>
+                                                {instaThumb && (
+                                                    <div className="mt-2">
+                                                        <Image
+                                                            src={URL.createObjectURL(instaThumb)}
+                                                            alt="Instagram Thumbnail Preview"
+                                                            style={{
+                                                                maxWidth: "50%",
+                                                                height: "auto",
+                                                                borderRadius: "10px"
+                                                            }}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </Col>
+                                            <Col md='12'>
+                                                <Form.Group controlId="image-upload">
+                                                    <Form.Label>Ground/Arena Layout Image</Form.Label>
+                                                    <Form.Control
+                                                        type="file"
+                                                        accept="image/*"
+                                                        onChange={handleLayoutImageChange}
+                                                    />
+                                                </Form.Group>
+                                            </Col>
+                                            {layoutImagePreview && (
+                                                <Col md="12" className="mt-3">
+                                                    <Image src={layoutImagePreview} alt="Preview" style={{ maxWidth: "50%", height: "auto", borderRadius: "10px" }} />
+                                                </Col>
+                                            )}
+                                        </Row>
                                     </Col>
-                                )}
-                                <Col md='12'>
-                                    <div className="form-group">
-                                        <label className="form-label">YouTube Video URL (Optional): *</label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            name="yt"
-                                            value={youtubeUrl}
-                                            placeholder="https://www.youtube.com/watch?v=Zjq1zRWpcgs"
-                                            onChange={(e) => setYoutubeUrl(e.target.value)}
-                                        />
-                                    </div>
-                                </Col>
-                                <Col lg="12">
-                                    <Form.Group className="mb-3 form-group d-flex align-items-center gap-3">
-                                        <div className="flex-grow-1">
-                                            <Form.Label>ID Card : (282 × 260 px)</Form.Label>
+                                    <Col lg="6" className='justify-content-center d-flex align-items-center'>
+                                        {renderPlaceholder()}
+                                    </Col>
+                                </Row>
+                                <div className="col-lg-12">
+                                    {imagepreview.map((preview, index) => (
+                                        <Col xs={3} sm={3} md={3} lg={3} key={index}>
+                                            <Card className="position-relative">
+                                                <Card.Body className="p-2">
+                                                    <div className="position-relative" style={{ width: "100%", paddingTop: "100%" }}>
+                                                        <Image
+                                                            src={preview || "/placeholder.svg"}
+                                                            alt={`Image ${index + 1}`}
+                                                            className="position-absolute top-0 start-0 w-100 h-100 object-cover rounded"
+                                                        />
+                                                        <Button
+                                                            variant="danger"
+                                                            size="sm"
+                                                            className="position-absolute top-0 end-0 p-1"
+                                                            style={{ transform: "translate(50%, -50%)", borderRadius: "50%" }}
+                                                            onClick={() => removeImage(index)}
+                                                        >
+                                                            <X size={12} />
+                                                        </Button>
+                                                    </div>
+                                                </Card.Body>
+                                            </Card>
+                                        </Col>
+                                    ))}
+                                    {/* Show upload button if less than 4 images */}
+                                    {imagepreview.length < 4 && (
+                                        <Form.Group controlId="image-upload">
+                                            <Form.Label>Upload Image</Form.Label>
                                             <Form.Control
                                                 type="file"
                                                 accept="image/*"
-                                                onChange={(e) => setIdCard(e.target.files[0])}
+                                                onChange={(e) => handleImageChange(e, imagepreview.length)}
                                             />
-                                        </div>
-                                        {idCard && (
-                                            <div>
-                                                <img
-                                                    src={
-                                                        typeof idCard === 'string'
-                                                            ? idCard
-                                                            : URL.createObjectURL(idCard)
-                                                    }
-                                                    alt="ID Card Preview"
-                                                    style={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 4 }}
-                                                />
-                                            </div>
-                                        )}
-                                    </Form.Group>
-                                </Col>
-
-
-                                <Col md='12'>
-                                    <div className="form-group">
-                                        <label className="form-label">Instagram URL (Optional):</label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            name="insta"
-                                            value={instaUrl}
-                                            placeholder="https://www.instagram.com/p/xyz123"
-                                            onChange={(e) => setInstaUrl(e.target.value)}
-                                        />
-                                    </div>
-                                </Col>
-                                <Col md='12'>
-                                    <Form.Group controlId="insta-thumb-upload">
-                                        <Form.Label>Instagram Thumbnail (Optional)</Form.Label>
-                                        <Form.Control
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={handleInstaThumbChange}
-                                        />
-                                    </Form.Group>
-                                    {instaThumb && (
-                                        <div className="mt-2">
-                                            <Image
-                                                src={URL.createObjectURL(instaThumb)}
-                                                alt="Instagram Thumbnail Preview"
-                                                style={{
-                                                    maxWidth: "50%",
-                                                    height: "auto",
-                                                    borderRadius: "10px"
-                                                }}
-                                            />
-                                        </div>
+                                        </Form.Group>
                                     )}
-                                </Col>
-                                <Col md='12'>
-                                    <Form.Group controlId="image-upload">
-                                        <Form.Label>Ground/Arena Layout Image</Form.Label>
-                                        <Form.Control
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={handleLayoutImageChange}
-                                        />
-                                    </Form.Group>
-                                </Col>
-                                {layoutImagePreview && (
-                                    <Col md="12" className="mt-3">
-                                        <Image src={layoutImagePreview} alt="Preview" style={{ maxWidth: "50%", height: "auto", borderRadius: "10px" }} />
-                                    </Col>
-                                )}
-                            </Row>
-                        </div>
+                                </div>
+                            </div>
+                        </Row>
                     </div>
 
                 </div>
