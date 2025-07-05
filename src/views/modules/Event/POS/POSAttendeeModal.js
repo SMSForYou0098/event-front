@@ -1,9 +1,58 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
+import { useMyContext } from "../../../../Context/MyContextProvider";
+import axios from "axios";
 
 const POSAttendeeModal = (props) => {
     const { show, handleClose, disabled, setName, name, setNumber, handleSubmit, setMethod, number } = props;
+    const {api , authToken} = useMyContext();
     const [error, setError] = useState("");
+    const [showNameField, setShowNameField] = useState(false);
+    const [isLoadingUser, setIsLoadingUser] = useState(false);
+
+    // Fetch user details when phone number is valid
+    const fetchUserDetails = useCallback(async () => {
+        if ((number?.length === 10 || number?.length === 12) && /^\d+$/.test(number)) {
+            setIsLoadingUser(true);
+            setError("");
+            
+            try {
+                // Use axios with authorization header
+                const response = await axios.get(`${api}pos/ex-user/${number}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (response.data.status) {
+                    const userData = response.data.data;
+                    setName(userData.name || "");
+                    setShowNameField(true);
+                } else {
+                    // User not found, show name field for manual entry
+                    setName("");
+                    setShowNameField(true);
+                }
+            } catch (error) {
+                console.error("Error fetching user details:", error);
+                if (error.response && error.response.status === 404) {
+                    // User not found, show name field for manual entry
+                    setName("");
+                } else {
+                    setError("Failed to fetch user details. Please try again.");
+                }
+                setShowNameField(true);
+            } finally {
+                setIsLoadingUser(false);
+            }
+        } else {
+            setShowNameField(false);
+            setName("");
+        }
+    }, [number, api, authToken, setName]);
+    useEffect(() => {
+        fetchUserDetails();
+    }, [fetchUserDetails]);
 
     const validateAndSubmit = () => {
         if (!name.trim()) {
@@ -29,18 +78,6 @@ const POSAttendeeModal = (props) => {
                     <Row className="d-flex justify-content-between">
                         <Col sm="12" md="12" className="form-group">
                             <Form.Control
-                                type="text"
-                                id="firstName"
-                                placeholder="Enter Name"
-                                value={name}
-                                onChange={(e) => {
-                                    setName(e.target.value);
-                                    setError(""); // Clear error on input
-                                }}
-                            />
-                        </Col>
-                        <Col sm="12" md="12" className="form-group">
-                            <Form.Control
                                 type="number"
                                 id="Phone_NO"
                                 value={number}
@@ -54,6 +91,21 @@ const POSAttendeeModal = (props) => {
                                 }}
                             />
                         </Col>
+                        {showNameField && (
+                            <Col sm="12" md="12" className="form-group">
+                                <Form.Control
+                                    type="text"
+                                    id="firstName"
+                                    placeholder={isLoadingUser ? "Loading..." : "Enter Name"}
+                                    value={name}
+                                    disabled={isLoadingUser}
+                                    onChange={(e) => {
+                                        setName(e.target.value);
+                                        setError(""); // Clear error on input
+                                    }}
+                                />
+                            </Col>
+                        )}
                         {error && (
                             <Col sm="12" className="text-danger text-center">
                                 {error}
@@ -111,9 +163,9 @@ const POSAttendeeModal = (props) => {
                                     type="button"
                                     className="btn btn-primary"
                                     onClick={validateAndSubmit}
-                                    disabled={!name.trim() || number?.length !== 10} // Disable button if fields are empty
+                                    disabled={!name.trim() || number?.length !== 10 || isLoadingUser} // Disable button if fields are empty or API is loading
                                 >
-                                    Submit
+                                    {isLoadingUser ? "Loading..." : "Submit"}
                                 </Button>
                                 <Button type="button" className="btn btn-success"
                                     onClick={() => handleClose(true)}>

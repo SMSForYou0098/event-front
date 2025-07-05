@@ -691,6 +691,7 @@ const NewChekout = memo(() => {
             const err = error.response?.data?.message || error.response?.data?.error || error.message || 'An error occurred while initiating payment.';
             setError(err);
         } finally {
+            setSelectedTickets(null);
             setLoading(false); // Reset loading state regardless of success/failure
         }
     }
@@ -745,8 +746,7 @@ const NewChekout = memo(() => {
                             />
                         }
 
-                        {
-                            isExpired ?
+                        {isExpired ?
                                 <div className="d-flex flex-column justify-content-center align-items-center" style={{ height: '50vh' }}>
                                     <ExpiredEvent />
                                 </div>

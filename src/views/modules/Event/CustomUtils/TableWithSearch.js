@@ -4,6 +4,7 @@ import BootstrapTable from 'react-bootstrap-table-next';
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory from 'react-bootstrap-table2-filter';
 import styled from 'styled-components';
+import * as XLSX from 'xlsx';
 import { ChevronDown, ChevronsUpDown, ChevronUp, Search } from 'lucide-react';
 import CommonDateRange from '../CustomHooks/CommonDateRange';
 
@@ -38,7 +39,9 @@ const TableWithSearch = ({
     loading,
     keyField = 'id',
     searchPlaceholder = 'Search...',
-    setDateRange
+    setDateRange,
+    ExportPermisson,
+    ignoredColumnsProp = []
 }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredData, setFilteredData] = useState([]);
@@ -109,7 +112,74 @@ const TableWithSearch = ({
         sizePerPageDropdownClass: 'custom-dropdown'
     };
 
+    const handleExport = () => {
+        try {
+            // Prepare the data for export
+            const ignoredColumns = ['Action', 'Actions', 'action', ...ignoredColumnsProp];
+            const exportData = filteredData?.map(row => {
+                const rowData = {};
+                columns.forEach(column => {
+                    // Skip action columns
+                    if (ignoredColumns.includes(column.text) || ignoredColumns.includes(column.dataField)) {
+                        return;
+                    }
 
+
+                    let value;
+
+                    // Handle nested data using column.formatter or direct value
+                    if (column.formatter) {
+                        value = column.formatter(row[column.dataField], row);
+                    } else {
+                        value = row[column.dataField];
+                    }
+
+                    // If value is an array, join as comma-separated string
+                    if (Array.isArray(value)) {
+                        rowData[column.text] = value
+                            .map(v => (typeof v === 'string' ? v.trim() : v))
+                            .filter(v => v && v !== ',' && v !== '')
+                            .join(', ');
+                    }
+                    // If value is a React element, extract text content
+                    else if (value && typeof value === 'object' && value.props) {
+                        // Try to extract text from children recursively
+                        const extractText = (children) => {
+                            if (typeof children === 'string') return children;
+                            if (Array.isArray(children)) return children.map(extractText).join(', ');
+                            if (children && typeof children === 'object' && children.props) {
+                                return extractText(children.props.children);
+                            }
+                            return '';
+                        };
+                        rowData[column.text] = extractText(value.props.children) || value.props.title || '';
+                    }
+                    // For other types
+                    else {
+                        rowData[column.text] = value;
+                    }
+                });
+                return rowData;
+            });
+
+            // Create a new workbook and worksheet
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(exportData);
+
+            // Add the worksheet to the workbook
+            XLSX.utils.book_append_sheet(wb, ws, 'Data');
+
+            // Generate filename with current date
+            const date = new Date().toISOString().split('T')[0];
+            const fileName = `${title || 'export'}_${date}.xlsx`;
+
+            // Save the file
+            XLSX.writeFile(wb, fileName);
+        } catch (error) {
+            console.error('Export failed:', error);
+            // You might want to add error handling/notification here
+        }
+    };
     return (
         <>
             <div className="row mb-3 me-0">

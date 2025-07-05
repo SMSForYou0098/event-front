@@ -299,7 +299,7 @@ const Users = memo(() => {
             </Card.Header>
             <Card.Body className="px-0">
               <TableWithSearch
-                setDateRange={setDateRange}
+                // setDateRange={setDateRange}
                 title="Users"
                 data={users}
                 columns={columns}

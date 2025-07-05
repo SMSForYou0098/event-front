@@ -130,6 +130,11 @@ const CanvasSettings = ({
 
   useEffect(() => {
     setLoading(true);
+    if(!previewUrl) {
+      setFinalImage(null);
+        setLoading(false);
+        return;
+    }
     const imgsrc = typeof previewUrl === "string" ? previewUrl : URL.createObjectURL(previewUrl);
     
     if (imgsrc && imgsrc?.startsWith("blob:")) {

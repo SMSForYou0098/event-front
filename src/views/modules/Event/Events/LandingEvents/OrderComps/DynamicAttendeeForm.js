@@ -10,7 +10,7 @@ import BookingsAttendee from './BookingsAttendee';
 import { processImageFile } from '../../../CustomComponents/AttendeeStroreUtils';
 
 const DynamicAttendeeForm = (props) => {
-    const { apiData, setAttendeeState, quantity, AttendyView, setAttendees, setDisable, category_id, getAttendees, isAgent, showAttendeeSuggetion,sucessAlert } = props;
+    const { apiData, setAttendeeState, quantity, AttendyView, setAttendees, setDisable, category_id, getAttendees, isAgent, showAttendeeSuggetion,sucessAlert,selectedTickets } = props;
     const { api, UserData } = useMyContext()
     const [existingAttendee, setExistingAttendee] = useState([]);
     const [attendeeList, setAttendeesList] = useState([]);
@@ -57,11 +57,11 @@ const DynamicAttendeeForm = (props) => {
 
     useEffect(() => {
         if (showAttendeeSuggetion) {
-            if (UserData && category_id) {
+            if (UserData && category_id && selectedTickets?.quantity > 0) {
                 GetUserAttandee()
             }
         }
-    }, [UserData?.id, category_id, showAttendeeSuggetion])
+    }, [showAttendeeSuggetion])
 
     const handleCloseModal = () => {
         setShowModal(false)
