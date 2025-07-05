@@ -4,8 +4,7 @@ import { Dashboard, Tus, Uppy } from "uppy";
 import { useMyContext } from '../../../../../../../Context/MyContextProvider';
 import { X } from 'lucide-react';
 import { processImageFile } from '../../../../CustomComponents/AttendeeStroreUtils';
-import EventMediaPreview, { PhotosGallary } from './EventMediaPreview';
-
+import { motion, AnimatePresence } from "framer-motion";
 
 const MediaFieldset = ({
     validated,
@@ -32,6 +31,8 @@ const MediaFieldset = ({
 }) => {
 
     const { ErrorAlert } = useMyContext();
+
+    const [imageLimitReached, setImageLimitReached] = useState(false);
 
     useEffect(() => {
         if (!loading) {
@@ -94,7 +95,13 @@ const MediaFieldset = ({
         setImagepreview(newPreviews);
     };
 
+    const removeImage = (index) => {
+        const newImages = images.filter((_, i) => i !== index);
+        const newPreviews = imagepreview.filter((_, i) => i !== index);
 
+        setImages(newImages);
+        setImagepreview(newPreviews);
+    };
 
     const handleInstaThumbChange = async (e) => {
         const file = e.target.files[0];
@@ -121,7 +128,51 @@ const MediaFieldset = ({
         }
     };
 
+    const textAnimationProps = {
+        initial: { opacity: 0, y: 10 },
+        animate: { opacity: 1, y: 0 },
+        transition: { delay: 0.2, duration: 0.3 },
+    };
+    const renderPlaceholder = (src) => (
+        src ? (
+            <div>
+                <img
+                    src={
+                        typeof src === 'string'
+                            ? src
+                            : URL.createObjectURL(src)
+                    }
+                    alt="ID Card Preview"
+                    style={{ width: 204, height: 321, objectFit: 'cover', borderRadius: 10 }}
+                />
+            </div>
+        ) : (
 
+            <div
+                className="d-flex flex-column justify-content-center align-items-center text-muted"
+                style={{
+                    border: "2px dashed var(--bs-secondary)",
+                    borderRadius: "8px",
+                    fontSize: "14px",
+                    textAlign: "center",
+                    padding: "10px",
+                    width: `204px`,
+                    height: `321px`,
+                    overflow: "hidden",
+                }}
+            >
+                <motion.div {...textAnimationProps}>
+                    No file selected
+                    <br />
+                    <small>
+                        Expected size: 321×204px
+                    </small>
+                    <br />
+                    <small>ID Card Preview</small>
+                </motion.div>
+            </div>
+        )
+    );
     return (
         <fieldset className={`${show === "Media" ? "d-block" : "d-none"}`}>
             <Form validated={validated} onSubmit={(e) => UpdateEvent(e)} className="needs-validation" noValidate>
@@ -148,10 +199,9 @@ const MediaFieldset = ({
                                     <span>Upload 16:9 ratio thumbnail image of atleast 600x725 px (jpg/jpeg/png)</span>
                                 </Form.Group>
                             </div>
-                            <Col md="7">
+                            <div className="col-md-7">
                                 <Row className='align-items-center'>
-                                    {/* media fields  */}
-                                    <Col lg="6">
+                                    <Col lg="4">
                                         <Row>
                                             {/* col 12 */}
                                             <Col xs={12} className="mb-3">
@@ -214,15 +264,13 @@ const MediaFieldset = ({
                                             </Col>
                                         </Row>
                                     </Col>
-                                    <Col lg="6" className="mt-3">
-                                        <EventMediaPreview
-                                            idCard={idCard}
-                                            instaThumb={instaThumb}
-                                            layoutImagePreview={layoutImagePreview}
-                                        />
+                                    <Col lg="8" className='justify-content-center d-flex align-items-center'>
+                                        {renderPlaceholder(idCard)}
+                                        {renderPlaceholder(instaThumb)}
+                                        {renderPlaceholder(layoutImagePreview)}
                                     </Col>
                                 </Row>
-                                <Col md="12">
+                                <div className="col-lg-12">
                                     {/* Show upload button if less than 4 images */}
                                     {imagepreview.length < 4 && (
                                         <Form.Group controlId="image-upload">
@@ -234,15 +282,34 @@ const MediaFieldset = ({
                                             />
                                         </Form.Group>
                                     )}
-                                    <PhotosGallary
-                                        imagepreview={imagepreview}
-                                        handleImageChange={handleImageChange}
-                                        setImagepreview={setImagepreview}
-                                        setImages={setImages}
-                                        images={images}
-                                    />
-                                </Col>
-                            </Col>
+                                    <div className="d-flex align-items-center gap-3 flex-wrap mt-3">
+                                        {imagepreview.map((preview, index) => (
+                                            <Col xs={3} sm={3} md={3} lg={3} key={index}>
+                                                <Card className="position-relative">
+                                                    <Card.Body className="p-2">
+                                                        <div className="position-relative" style={{ width: "100%", paddingTop: "100%" }}>
+                                                            <Image
+                                                                src={preview || "/placeholder.svg"}
+                                                                alt={`Image ${index + 1}`}
+                                                                className="position-absolute top-0 start-0 w-100 h-100 object-cover rounded"
+                                                            />
+                                                            <Button
+                                                                variant="danger"
+                                                                size="sm"
+                                                                className="position-absolute top-0 end-0 p-1"
+                                                                style={{ transform: "translate(50%, -50%)", borderRadius: "50%" }}
+                                                                onClick={() => removeImage(index)}
+                                                            >
+                                                                <X size={12} />
+                                                            </Button>
+                                                        </div>
+                                                    </Card.Body>
+                                                </Card>
+                                            </Col>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
                         </Row>
                     </div>
 

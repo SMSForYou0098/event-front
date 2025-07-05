@@ -379,6 +379,7 @@ const EditEvent = () => {
                 formData.append('layout_image', layoutImage);
                 formData.append('insta_url', instaUrl);
                 formData.append('insta_thumb', instaThumb);
+                formData.append('card_url', idCard);
                 if (images.length > 0) {
                     formData.append('images_1', images[0]);
                     formData.append('images_2', images[1]);
