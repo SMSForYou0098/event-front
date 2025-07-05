@@ -61,6 +61,7 @@ const EditEvent = () => {
     const [images, setImages] = useState([]);
     const [imagepreview, setImagepreview] = useState([]);
     const [idCard,setIdCard] = useState('')
+    const [isCircle, setIsCircle] = useState(false);
 
 
     // seo states 
@@ -565,6 +566,8 @@ const EditEvent = () => {
                                     youtubeUrl={youtubeUrl}
                                     setYoutubeUrl={setYoutubeUrl}
                                     show={show}
+                                    isCircle={isCircle}
+                                    setIsCircle={setIsCircle}
                                 />
                                 <PublishFieldset
                                     metaTitle={metaTitle}

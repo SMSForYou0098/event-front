@@ -215,8 +215,8 @@ const CanvasSettings = ({
                       <Form.Label>Number</Form.Label>
                       <Form.Control
                         type="text"
-                        name="Number"
-                        value={dummyUserData.Number}
+                        name="number"
+                        value={dummyUserData.number}
                         onChange={handleInputChange}
                         placeholder="Enter Number"
                       />
@@ -227,7 +227,7 @@ const CanvasSettings = ({
                       <Form.Label>email</Form.Label>
                       <Form.Control
                         type="text"
-                        name="email_name"
+                        name="email"
                         value={dummyUserData.email}
                         onChange={handleInputChange}
                         placeholder="Enter email"

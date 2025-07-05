@@ -1625,7 +1625,6 @@ const IDCardDragAndDrop = ({
     userImage,
     orderId,
     savedLayout,
-    zones,
     isCircle,
     canvasReady,
   ]);

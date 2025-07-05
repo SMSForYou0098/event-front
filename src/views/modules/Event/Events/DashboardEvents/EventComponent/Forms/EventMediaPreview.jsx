@@ -5,7 +5,7 @@ import CanvasSettings from "../../../../CustomUtils/CanvasSettings";
 import { X } from "lucide-react";
 
 export const PhotosGallary = (props) => {
-  const { imagepreview, setImages, setImagepreview, images } = props;
+  const { imagepreview, setImages, setImagepreview, images, isCircle, setIsCircle } = props;
   const removeImage = (index) => {
     const newImages = images.filter((_, i) => i !== index);
     const newPreviews = imagepreview.filter((_, i) => i !== index);
