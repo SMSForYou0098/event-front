@@ -198,27 +198,27 @@ const Attendees = memo(() => {
               // isDisabled: row?.status !== 1 || parseInt(row.approval_status) !== 1,
               visible: true,
             },
-            {
-              tooltip: "Preview User",
-              icon: <Eye size={16} />,
-              // onClick: () => handlePreview(row.id),
-              variant: "info",
-              visible: true,
-            },
-            {
-              tooltip: "Manage User",
-              icon: <Edit size={16} />,
-              // onClick: () => AssignCredit(row.id),
-              variant: "primary",
-              visible: true,
-            },
-            {
-              tooltip: "Delete User",
-              icon: <Trash2 size={16} />,
-              // onClick: () => HandleDelete(row.id),
-              variant: "danger",
-              visible: true,
-            },
+            // {
+            //   tooltip: "Preview User",
+            //   icon: <Eye size={16} />,
+            //   // onClick: () => handlePreview(row.id),
+            //   variant: "info",
+            //   visible: true,
+            // },
+            // {
+            //   tooltip: "Manage User",
+            //   icon: <Edit size={16} />,
+            //   // onClick: () => AssignCredit(row.id),
+            //   variant: "primary",
+            //   visible: true,
+            // },
+            // {
+            //   tooltip: "Delete User",
+            //   icon: <Trash2 size={16} />,
+            //   // onClick: () => HandleDelete(row.id),
+            //   variant: "danger",
+            //   visible: true,
+            // },
           ];
 
           return (
@@ -289,7 +289,7 @@ const Attendees = memo(() => {
               top: 0,
               left: 0,
               width: "100%",
-              height: "100%",
+              height: '40vh',
               backgroundColor: "rgba(0, 0, 0, 0.8)",
               display: "flex",
               justifyContent: "center",
@@ -321,11 +321,25 @@ const Attendees = memo(() => {
           card_url={selectedEvent?.card_url || ""}
           showTicketDetails={true}
           showPrintButton={true}
+          eventId={selectedEvent?.value}
           // downloadTicket={downloadTicket}
           isMobile={isMobile}
           formatDateRange={formatDateRange}
           convertTo12HourFormat={convertTo12HourFormat}
         />
+        {
+          !selectedEvent ? <div className="card text-center">
+          <div className="card-body">
+            <div className="mb-3">
+              <i className="fas fa-building fa-3x text-muted"></i>
+            </div>
+            <h5 className="card-title text-muted">Select Event First</h5>
+            <p className="card-text text-muted">
+              Please select an event from the dropdown above to view the users list.
+            </p>
+          </div>
+        </div> : 
+
         <CommonListing
           tile={"Attendees"}
           bookings={users}
@@ -335,6 +349,7 @@ const Attendees = memo(() => {
           ShowReportCard={false}
           searchPlaceholder={"Search Attendees..."}
         />
+        }
       </Row>
     </Fragment>
   );

@@ -217,9 +217,6 @@ const EditEvent = () => {
         }
     }, [state?.value, country?.value]);
 
-    console.log('Layout Data:', layoutData)
-
-
     useEffect(() => {
         setEventId(id)
         if (show !== 'Detail') {

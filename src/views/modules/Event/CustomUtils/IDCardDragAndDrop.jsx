@@ -13,7 +13,6 @@ const IDCardDragAndDrop = ({
   orderId,
   userData,
   userImage,
-  zones = [],
   bgRequired = true,
   isEdit = true,
   isCircle = false,
@@ -24,9 +23,9 @@ const IDCardDragAndDrop = ({
   setShowSettingsModal,
   categoryId,
   fetchingLayout,
+  handleCloseModal,
   savedLayout
 }) => {
-  console.log('uuu',userData)
   const canvasRef = useRef(null);
   const qrCodeRef = useRef(null);
   const historyRef = useRef([]);
@@ -38,10 +37,12 @@ const IDCardDragAndDrop = ({
   const [elementPositions, setElementPositions] = useState({});
   const [showIntroAnimation, setShowIntroAnimation] = useState(animate);
   const [animationComplete, setAnimationComplete] = useState(!animate);
-  const { authToken, ErrorAlert, api } = useMyContext();
+  const { authToken, ErrorAlert, api, isMobile } = useMyContext();
   
   // Fetch layout from API
-
+ // Fixed canvas dimensions
+  const CANVAS_WIDTH = 204;
+  const CANVAS_HEIGHT = 321;
   const saveLayoutToBackend = async (layoutData) => {
   try {
     setLoading(true);
@@ -685,7 +686,7 @@ const IDCardDragAndDrop = ({
     canvas.renderAll();
     trackElementPositions(canvas);
     saveCanvasState(canvas);
-  }, [canvasReady, zones, trackElementPositions, saveCanvasState]);
+  }, [canvasReady,  trackElementPositions, saveCanvasState]);
 
   const startIntroAnimation = useCallback(
     async (canvas) => {
@@ -1305,7 +1306,7 @@ const IDCardDragAndDrop = ({
 
                 // Use current position if available, otherwise use saved layout or default
                 const positionSource =
-                  currentPositions?.userPhoto || savedLayout?.userPhoto;
+                  currentPositions?.userPhoto || savedLayout?.userPhoto || savedLayout?.user_photo;
 
                 // For shake animation, start at final position but with low opacity
                 let finalLeft = positionSource?.left || circleCenterX;
@@ -1361,77 +1362,90 @@ const IDCardDragAndDrop = ({
         }
 
         // Add text elements
-        const addTextElement = (text, name, defaultLeft, defaultTop) => {
-          const positionSource =
-            currentPositions?.[name] || savedLayout?.[name];
+        const addTextElement = (
+  text,
+  dynamicKey,
+  defaultLeft,
+  defaultTop,
+  savedKey = null // optional backup key
+) => {
+  // 🔍 Try currentPositions or savedLayout using both keys
+  const positionSource =
+    currentPositions?.[dynamicKey] ||
+    currentPositions?.[savedKey] ||
+    savedLayout?.[dynamicKey] ||
+    savedLayout?.[savedKey];
 
-          // For shake animation, start at final position but with low opacity
-          let finalLeft = positionSource?.left || defaultLeft;
-          let finalTop = positionSource?.top || defaultTop;
-          let startOpacity = 1;
+  let finalLeft = positionSource?.left || defaultLeft;
+  let finalTop = positionSource?.top || defaultTop;
+  let startOpacity = 1;
 
-          if (showIntroAnimation && !animationComplete && !positionSource) {
-            startOpacity = 0.3; // Start with low opacity for fade-in effect
-          }
+  if (showIntroAnimation && !animationComplete && !positionSource) {
+    startOpacity = 0.3;
+  }
 
-          const textElement = new fabric.Text(text, {
-            fontSize: 18,
-            fontFamily: "Arial",
-            fill: "#076066",
-            fontWeight: "bold",
-            left: finalLeft,
-            top: finalTop,
-            originX: positionSource?.originX || "center",
-            originY: positionSource?.originY || "top",
-            scaleX: positionSource?.scaleX || 1,
-            scaleY: positionSource?.scaleY || 1,
-            angle: positionSource?.angle || 0,
-            opacity: startOpacity,
-            selectable: isEdit,
-            evented: isEdit,
-            hasControls: isEdit,
-            hasBorders: isEdit,
-            name: name,
-            // Store final position for animation
-            finalLeft: finalLeft,
-            finalTop: finalTop,
-            finalAngle: positionSource?.angle || 0,
-          });
+  const textElement = new fabric.Text(text, {
+    fontSize: 18,
+    fontFamily: "Arial",
+    fill: "#076066",
+    fontWeight: "bold",
+    left: finalLeft,
+    top: finalTop,
+    originX: positionSource?.originX || "center",
+    originY: positionSource?.originY || "top",
+    scaleX: positionSource?.scaleX || 1,
+    scaleY: positionSource?.scaleY || 1,
+    angle: positionSource?.angle || 0,
+    opacity: startOpacity,
+    selectable: isEdit,
+    evented: isEdit,
+    hasControls: isEdit,
+    hasBorders: isEdit,
+    name: dynamicKey, // 🏷 unique identifier
+    finalLeft,
+    finalTop,
+    finalAngle: positionSource?.angle || 0,
+  });
 
-          return textElement;
-        };
+  return textElement;
+};
+
 
         const valueLeft = canvas?.width / 2;
         const startTop = 320;
         const verticalGap = 25;
 
         const values = [
-          capitalize(userData?.name) || "User Name",
-          capitalize(userData?.designation) || "Designation",
-          capitalize(userData?.company_name || userData?.comp_name) ||
-            "Company Name",
-        ];
+  capitalize(userData?.Name) || "User Name",
+  capitalize(userData?.Email) || "Email",
+  capitalize(userData?.Mo || userData?.comp_name) || "Company Name",
+];
 
-        values.forEach((text, i) => {
-          canvas.add(
-            addTextElement(
-              text,
-              `textValue_${i}`,
-              valueLeft,
-              startTop + i * verticalGap
-            )
-          );
-        });
+values.forEach((text, i) => {
+  const dynamicKey = `textValue_${i}`;
+  const savedKey = `text_${i + 1}`;
+
+  canvas.add(
+    addTextElement(
+      text,
+      dynamicKey,                // Main key to name the element
+      valueLeft,
+      startTop + i * verticalGap,
+      savedKey                   // ✅ Send backup/saved key as well
+    )
+  );
+});
+
 
         // QR Code
         if (orderId) {
           try {
             // Generate QR code at much higher resolution for better quality
             const qrDataURL = await QRCode.toDataURL(orderId, {
-              margin: 0.5,
-              width: 400, // 4x higher resolution (was 100, now 400)
-              errorCorrectionLevel: "H", // Highest error correction for better quality
-            });
+  margin: 0.5,
+  width: CANVAS_WIDTH, // use the same width for high-res QR
+  errorCorrectionLevel: "H",
+});
             const qrImg = await new Promise((resolve) => {
               fabric.Image.fromURL(
                 qrDataURL,
@@ -1445,7 +1459,7 @@ const IDCardDragAndDrop = ({
 
                   // Use current position if available, otherwise use saved layout or default
                   const positionSource =
-                    currentPositions?.qrCode || savedLayout?.qrCode;
+                    currentPositions?.qrCode || savedLayout?.qrCode || savedLayout?.qr_code;
 
                   let finalLeft = positionSource?.left || qrPositionX;
                   let finalTop = positionSource?.top || qrPositionY;
@@ -1496,107 +1510,7 @@ const IDCardDragAndDrop = ({
           }
         }
 
-        // Zone Boxes - Create as a group for easier positioning
-        const boxWidth = 28;
-        const boxHeight = 28;
-        const boxPadding = 8;
-        const numBoxes = zones?.length ?? 0;
-        const totalBoxesWidth =
-          numBoxes * boxWidth + (numBoxes - 1) * boxPadding;
-        const boxStartX = (canvas?.width - totalBoxesWidth) / 2;
-        const boxStartY = 530;
-        const borderRadius = 8;
 
-        const userZones = userData?.company?.zone
-          ? Array.isArray(userData.company.zone)
-            ? userData.company.zone
-            : JSON.parse(userData.company.zone)
-          : [];
-
-        if (numBoxes > 0) {
-          const zoneElements = [];
-
-          for (let i = 0; i < numBoxes; i++) {
-            const currentZone = zones[i];
-            const isUserZone = userZones.includes(
-              currentZone?.id || currentZone
-            );
-
-            const box = new fabric.Rect({
-              left: i * (boxWidth + boxPadding),
-              top: 0,
-              width: boxWidth,
-              height: boxHeight,
-              fill: isUserZone ? "#076066" : "#f0f0f0",
-              rx: borderRadius,
-              ry: borderRadius,
-              stroke: "#076066",
-              strokeWidth: 2,
-              selectable: false,
-              evented: false,
-            });
-
-            const label = isUserZone
-              ? new fabric.Text("✓", {
-                  fontSize: 16,
-                  fill: "white",
-                  fontWeight: "bold",
-                })
-              : new fabric.Text((i + 1).toString(), {
-                  fontSize: 14,
-                  fill: "#076066",
-                  fontWeight: "bold",
-                });
-
-            label.set({
-              left: i * (boxWidth + boxPadding) + boxWidth / 2,
-              top: boxHeight / 2,
-              originX: "center",
-              originY: "center",
-              fontFamily: "Arial",
-              selectable: false,
-              evented: false,
-            });
-
-            zoneElements.push(box, label);
-          }
-
-          // Use current position if available, otherwise use saved layout or default
-          const positionSource =
-            currentPositions?.zoneGroup || savedLayout?.zoneGroup;
-
-          let finalLeft = positionSource?.left || boxStartX;
-          let finalTop = positionSource?.top || boxStartY;
-          let startOpacity = 1;
-
-          if (showIntroAnimation && !animationComplete && !positionSource) {
-            startOpacity = 0.3; // Start with low opacity for fade-in effect
-          }
-
-          const zoneGroup = new fabric.Group(zoneElements, {
-            left: finalLeft,
-            top: finalTop,
-            originX: positionSource?.originX || "left",
-            originY: positionSource?.originY || "top",
-            scaleX: positionSource?.scaleX || 1,
-            scaleY: positionSource?.scaleY || 1,
-            angle: positionSource?.angle || 0,
-            opacity: startOpacity,
-            selectable: isEdit,
-            evented: isEdit,
-            hasControls: isEdit,
-            hasBorders: isEdit,
-            name: "zoneGroup",
-            lockRotation: false,
-            lockScalingFlip: true,
-            // Store final position for animation
-            finalLeft: finalLeft,
-            finalTop: finalTop,
-            finalAngle: positionSource?.angle || 0,
-          });
-
-          canvas.add(zoneGroup);
-        }
 
         // Update element positions tracking
         trackElementPositions(canvas);
@@ -1620,10 +1534,9 @@ const IDCardDragAndDrop = ({
 
     updateCanvasContent();
   }, [
-    userData?.name,
-    userData?.designation,
-    userData?.company_name,
-    userData?.comp_name,
+    userData?.Name,
+    userData?.Email,
+    userData?.Mo,
     userImage,
     orderId,
     savedLayout,
@@ -1707,7 +1620,7 @@ const IDCardDragAndDrop = ({
       }
 
       // Use common upscale function with 6x preferred multiplier for download
-      const { dataURL, actualMultiplier } = await upscaleCanvas(canvas, 6);
+      const { dataURL, actualMultiplier } = await upscaleCanvas(canvas, 4);
 
       // Create and trigger download
       const link = document.createElement("a");
@@ -1729,6 +1642,7 @@ const IDCardDragAndDrop = ({
       const filename = `id_card_${qualityLabel}_${
         orderId || userData?.name?.replace(/\s+/g, "_") || "id"
       }.png`;
+      handleCloseModal();
       UploadToAPIBackground({
         dataURL,
         filename,
@@ -1754,87 +1668,77 @@ const IDCardDragAndDrop = ({
   };
 
   const printCanvas = async () => {
-    setLoading(true);
-    try {
-      const canvas = canvasRef.current.fabricCanvas;
-      if (!canvas) {
-        throw new Error("Canvas not found");
-      }
+  setLoading(true);
+  try {
+    const canvas = canvasRef.current.fabricCanvas;
+    if (!canvas) {
+      throw new Error("Canvas not found");
+    }
 
-      // Use common upscale function with 6x preferred multiplier for print
-      const { dataURL, actualMultiplier } = await upscaleCanvas(canvas, 6);
+    // Use common upscale function with 6x preferred multiplier for print
+    const { dataURL, actualMultiplier } = await upscaleCanvas(canvas, 4);
 
-      // Update card status via API
-      try {
-        const response = await fetch(`${api}card-status/${userData.id}/1`, {
-          headers: { Authorization: `Bearer ${authToken}` },
-        });
+    // Create print window
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+      throw new Error("Popup blocked. Please allow popups to print.");
+    }
 
-        if (!response.ok) {
-          ErrorAlert("Card status update failed. Printing will continue.");
-        }
-      } catch (apiError) {
-        ErrorAlert("Failed to update card status. Printing will continue.");
-      }
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Print ID Card</title>
+          <style>
+            body {
+              margin: 0;
+              padding: 0;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 100vh;
+              background: #fff;
+            }
+            img {
+              max-width: 100%;
+              max-height: 100vh;
+            }
+          </style>
+        </head>
+        <body>
+          <img id="printImage" src="${dataURL}" />
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
 
-      // Create print window
-      const printWindow = window.open("", "_blank");
-      if (!printWindow) {
-        throw new Error("Popup blocked. Please allow popups to print.");
-      }
-
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>Print ID Card</title>
-            <style>
-              body {
-                margin: 0;
-                padding: 0;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                background: #fff;
-              }
-              img {
-                max-width: 100%;
-                max-height: 100vh;
-              }
-            </style>
-          </head>
-          <body>
-            <img id="printImage" src="${dataURL}" />
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-
-      printWindow.onload = () => {
-        const img = printWindow.document.getElementById("printImage");
-        if (img.complete) {
+    printWindow.onload = () => {
+      const img = printWindow.document.getElementById("printImage");
+      if (img.complete) {
+        printWindow.focus();
+        printWindow.print();
+      } else {
+        img.onload = () => {
           printWindow.focus();
           printWindow.print();
-        } else {
-          img.onload = () => {
-            printWindow.focus();
-            printWindow.print();
-          };
-          img.onerror = () => {
-            alert("Failed to load image for printing.");
-          };
-        }
-      };
-    } catch (err) {
-      alert("Printing failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+        };
+        img.onerror = () => {
+          alert("Failed to load image for printing.");
+        };
+      }
+    };
+          handleCloseModal();
+
+  } catch (err) {
+    alert("Printing failed. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   if (fetchingLayout || loading) {
-    console.log("Loading layout or content...",fetchingLayout);
+    // console.log("Loading layout or content...",fetchingLayout);
     return (
       <div className="text-center py-5">
         <Spinner animation="border" role="status" />
@@ -1845,85 +1749,92 @@ const IDCardDragAndDrop = ({
 
   return (
     <>
-      <div className="d-flex gap-2 mb-3 justify-content-end">
-        {isEdit && (
-          <>
-            <Button
-              variant="outline-secondary"
-              onClick={resetElementPositions}
-              disabled={!canvasReady || loading}
-              className="d-flex align-items-center gap-2"
-              title="Reset all elements to default positions"
-            >
-              Reset
-              <RotateCcw size={16} />
-            </Button>
-            <Button
-              variant="primary"
-              onClick={() => saveLayoutToBackend(elementPositions)}
-              disabled={!canvasReady || loading}
-              className="d-flex align-items-center gap-2"
-            >
-              {loading ? "Saving..." : "Save Layout"}
-              <Save size={16} />
-            </Button>
-          </>
-        )}
-        {download && (
-          <Button
-            variant="primary"
-            onClick={downloadCanvas}
-            disabled={!canvasReady || loading}
-            className="d-flex align-items-center gap-2"
-            title="Download ID Card in 4K quality"
-          >
-            {loading ? "Please Wait..." : "Download"}
-            <ArrowBigDownDash size={16} />
-          </Button>
-        )}
-        {print && (
-          <Button
-            variant="secondary"
-            onClick={printCanvas}
-            disabled={!canvasReady || loading}
-            className="d-flex align-items-center gap-2"
-          >
-            Print
-            <Printer size={16} />
-          </Button>
-        )}
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          overflow: "auto",
-          position: "relative",
-        }}
+      <div className="d-flex gap-2 mb-3 justify-content-end flex-wrap">
+  {isEdit && (
+    <>
+      <Button
+        variant="outline-secondary"
+        onClick={resetElementPositions}
+        disabled={!canvasReady || loading}
+        className="d-flex align-items-center gap-2"
+        title="Reset all elements to default positions"
       >
-        {finalImage && userData ? (
-          <div
-            style={{
-              border: "1px solid #ddd",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-              display: "inline-block",
-              borderRadius: "12px",
-              overflow: "hidden",
-            }}
-          >
-            <canvas ref={canvasRef} style={{ display: "block" }} />
-          </div>
-        ) : (
-          <div className="text-center py-5">
-            <Spinner animation="border" role="status" />
-            <p className="mt-2">Loading ID Card...</p>
-          </div>
-        )}
-      </div>
-      <div style={{ display: "none" }}>
-        <QRCodeCanvas ref={qrCodeRef} value={orderId} size={150 * 3} />
-      </div>
+        Reset
+        <RotateCcw size={16} />
+      </Button>
+      <Button
+        variant="primary"
+        onClick={() => saveLayoutToBackend(elementPositions)}
+        disabled={!canvasReady || loading}
+        className="d-flex align-items-center gap-2"
+      >
+        {loading ? "Saving..." : "Save Layout"}
+        <Save size={16} />
+      </Button>
+    </>
+  )}
+  {download && (
+    <Button
+      variant="primary"
+      onClick={downloadCanvas}
+      disabled={!canvasReady || loading}
+      className="d-flex align-items-center gap-2"
+      title="Download ID Card in 4K quality"
+    >
+      {loading ? "Please Wait..." : "Download"}
+      <ArrowBigDownDash size={16} />
+    </Button>
+  )}
+  {print && (
+    <Button
+      variant="secondary"
+      onClick={printCanvas}
+      disabled={!canvasReady || loading}
+      className="d-flex align-items-center gap-2"
+    >
+      Print
+      <Printer size={16} />
+    </Button>
+  )}
+</div>
+
+<div
+  style={{
+    display: "flex",
+    justifyContent: "center",
+    overflowX: "auto",
+    position: "relative",
+  }}
+>
+  {finalImage && userData ? (
+    <div
+      style={{
+        border: "1px solid #ddd",
+        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+        borderRadius: "12px",
+        overflow: "hidden",
+transform: !isEdit
+  ? isMobile
+    ? "scale(0.5)"
+    : "scale(0.75)"
+  : "none",
+        transformOrigin: "top center", // ✅ Important: scale from top center
+      }}
+    >
+      <canvas ref={canvasRef} style={{ display: "block" }} />
+    </div>
+  ) : (
+    <div className="text-center py-5 w-100">
+      <Spinner animation="border" role="status" />
+      <p className="mt-2">Loading ID Card...</p>
+    </div>
+  )}
+</div>
+
+<div style={{ display: "none" }}>
+  <QRCodeCanvas ref={qrCodeRef} value={orderId} size={150 * 3} />
+</div>
+
     </>
   );
 };

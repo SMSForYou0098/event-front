@@ -74,9 +74,9 @@ const CanvasSettings = ({
   const [loading, setLoading] = useState(false);
 
   const [dummyUserData, setDummyUserData] = useState({
-    name: "Your name",
-    number: "Your Company name",
-    email: "Your designation",
+    Name: "Your name",
+    Mo: "Your Mobile Number",
+    Email: "Email alice.johnson.example.com",
     // company: { zone: [2, 3, 5] },
   });
 
@@ -90,7 +90,7 @@ const CanvasSettings = ({
   }, [setIsCircle]);
 
   useEffect(() => {
-    console.log("Fetching layout for categoryId:", categoryId);
+    // console.log("Fetching layout for categoryId:", categoryId);
     if (!categoryId || !authToken) return;
     
     // const fetchLayout = async () => {
@@ -144,7 +144,7 @@ const CanvasSettings = ({
     }
 
     const fetchImages = async () => {
-        console.log("Fetching images for previewUrl:", imgsrc);
+        // console.log("Fetching images for previewUrl:", imgsrc);
       await Promise.all([
         FetchImageBlob(api, setLoading, imgsrc, setFinalImage, authToken),
       ]);
@@ -203,8 +203,8 @@ const CanvasSettings = ({
                       <Form.Label>Name</Form.Label>
                       <Form.Control
                         type="text"
-                        name="name"
-                        value={dummyUserData.name}
+                        name="Name"
+                        value={dummyUserData.Name}
                         onChange={handleInputChange}
                         placeholder="Enter name"
                       />
@@ -215,8 +215,8 @@ const CanvasSettings = ({
                       <Form.Label>Number</Form.Label>
                       <Form.Control
                         type="text"
-                        name="number"
-                        value={dummyUserData.number}
+                        name="Mo"
+                        value={dummyUserData.Mo}
                         onChange={handleInputChange}
                         placeholder="Enter Number"
                       />
@@ -227,8 +227,8 @@ const CanvasSettings = ({
                       <Form.Label>email</Form.Label>
                       <Form.Control
                         type="text"
-                        name="email"
-                        value={dummyUserData.email}
+                        name="Email"
+                        value={dummyUserData.Email}
                         onChange={handleInputChange}
                         placeholder="Enter email"
                       />

@@ -12,6 +12,7 @@ const IdCard = (props) => {
     userPhoto,
     idCardBg,
     bgRequired,
+    savedLayout,
     imageLoading,
   } = props;
   const canvasRef = useRef(null);
@@ -64,119 +65,117 @@ const IdCard = (props) => {
     };
 
     const drawCanvas = () => {
-      canvas.clear();
+  canvas.clear();
 
-      // ✅ Now idCardBg is guaranteed to be defined
-      // Clear any existing background image
-      canvas.setBackgroundImage(null, () => {
-        canvas.renderAll();
-      });
+  // Set background
+  canvas.setBackgroundImage(null, () => {
+    canvas.renderAll();
+  });
 
-      // Conditionally load background only if bgRequired is true and idCardBg is set
-      if (bgRequired && idCardBg) {
-        fabric.Image.fromURL(
-          idCardBg,
-          (bgImg) => {
-            bgImg.set({
+  if (bgRequired && idCardBg) {
+    fabric.Image.fromURL(
+      idCardBg,
+      (bgImg) => {
+        bgImg.set({
+          left: 0,
+          top: 0,
+          scaleX: CANVAS_WIDTH / bgImg.width,
+          scaleY: CANVAS_HEIGHT / bgImg.height,
+          selectable: false,
+          evented: false,
+        });
+        canvas.setBackgroundImage(bgImg, () => {
+          canvas.renderAll();
+        });
+      },
+      { crossOrigin: "anonymous" }
+    );
+  } else {
+    canvas.backgroundColor = "transparent";
+    canvas.renderAll();
+  }
+
+  // --- User Photo ---
+  if (userPhoto && savedLayout?.user_photo) {
+    fabric.Image.fromURL(
+      userPhoto,
+      (img) => {
+        img.set({
+          ...savedLayout.user_photo,
+          selectable: false,
+          evented: false,
+        });
+
+        // If isCircle, clip to circle
+        if (savedLayout.user_photo.isCircle) {
+          const radius = Math.min(
+            (savedLayout.user_photo.width || img.width) * (savedLayout.user_photo.scaleX || 1) / 2,
+            (savedLayout.user_photo.height || img.height) * (savedLayout.user_photo.scaleY || 1) / 2
+          );
+          img.set({
+            clipPath: new fabric.Circle({
+              radius,
+              originX: 'center',
+              originY: 'center',
               left: 0,
               top: 0,
-              scaleX: CANVAS_WIDTH / bgImg.width,
-              scaleY: CANVAS_HEIGHT / bgImg.height,
-              selectable: false,
-              evented: false,
-            });
-
-            canvas.setBackgroundImage(bgImg, () => {
-              canvas.renderAll();
-            });
-          },
-          { crossOrigin: "anonymous" }
-        );
-      } else {
-        // Fallback: use transparent background (default)
-        canvas.backgroundColor = "transparent";
-        canvas.renderAll();
-      }
-
-      // other rendering logic here...
-
-      const qrCodeCanvas = qrCodeRef.current;
-
-      // Show profile image
-      if (userPhoto) {
-        const profileImageURL = userPhoto;
-        const circleCenterX = 95;
-        const circleCenterY = 60;
-        const circleRadius = 45; // smaller image
-        // Try Fabric.js first
-        fabric.Image.fromURL(
-          profileImageURL,
-          (img) => {
-            if (img) {
-              const scale =
-                (circleRadius * 2) / Math.max(img?.width, img.height);
-              img.set({
-                left: circleCenterX - circleRadius,
-                top: circleCenterY - circleRadius,
-                scaleX: scale,
-                scaleY: scale,
-                selectable: false,
-                evented: false,
-              });
-
-              canvas.add(img);
-              canvas.renderAll();
-            } else {
-              // Fallback to native canvas
-              const ctx = canvas.getContext("2d");
-              const nativeImg = new window.Image();
-              nativeImg.crossOrigin = "anonymous";
-              nativeImg.onload = function () {
-                ctx.drawImage(
-                  nativeImg,
-                  circleCenterX - circleRadius,
-                  circleCenterY - circleRadius,
-                  circleRadius * 2,
-                  circleRadius * 2
-                );
-              };
-              nativeImg.src = profileImageURL;
-            }
-          },
-          { crossOrigin: "anonymous" }
-        );
-      }
-      // Conditionally show other ticket details
-      if (showDetails) {
-        centerText(`${user.Name}` || "User Name", 16, "Arial", canvas, 115);
-        centerText(`${user.Email}` || "User Email", 16, "Arial", canvas, 135);
-        centerText(`${user.Mo}` || "User Number", 16, "Arial", canvas, 160);
-
-        //qrCodeCanvas
-        if (qrCodeCanvas) {
-          const qrCodeDataURL = qrCodeCanvas.toDataURL("image/png");
-          fabric.Image.fromURL(qrCodeDataURL, (qrImg) => {
-            const qrCodeWidth = 80;
-            const qrCodeHeight = 80;
-            const qrPositionX = 60;
-            const qrPositionY = 190;
-
-            qrImg.set({
-              left: qrPositionX,
-              top: qrPositionY,
-              selectable: false,
-              evented: false,
-              scaleX: qrCodeWidth / qrImg.width,
-              scaleY: qrCodeHeight / qrImg.height,
-            });
-
-            canvas.add(qrImg);
-            canvas.renderAll();
+            }),
           });
         }
+
+        canvas.add(img);
         canvas.renderAll();
-      }
-    };
+      },
+      { crossOrigin: "anonymous" }
+    );
+  }
+
+  // --- QR Code ---
+  const qrCodeCanvas = qrCodeRef.current;
+  if (qrCodeCanvas && savedLayout?.qr_code) {
+    const qrCodeDataURL = qrCodeCanvas.toDataURL("image/png");
+    fabric.Image.fromURL(qrCodeDataURL, (qrImg) => {
+      qrImg.set({
+        ...savedLayout.qr_code,
+        selectable: false,
+        evented: false,
+      });
+      canvas.add(qrImg);
+      canvas.renderAll();
+    });
+  }
+
+  if (savedLayout?.text_1) {
+  const text1 = new fabric.Text(String(user?.Name || "User Name"), {
+    ...savedLayout.text_1,
+    selectable: false,
+    evented: false,
+  });
+  canvas.add(text1);
+}
+
+// --- Text 2 ---
+if (savedLayout?.text_2) {
+  const text2 = new fabric.Text(String(user?.Email || "User Email"), {
+    ...savedLayout.text_2,
+    selectable: false,
+    evented: false,
+  });
+  canvas.add(text2);
+}
+
+// --- Text 3 ---
+if (savedLayout?.text_3) {
+  const text3 = new fabric.Text(String(user?.Mo || "User Number"), {
+    ...savedLayout.text_3,
+    selectable: false,
+    evented: false,
+  });
+  canvas.add(text3);
+}
+
+  canvas.renderAll();
+};
 
     drawCanvas();
 
@@ -283,7 +282,7 @@ const IdCard = (props) => {
     link.style.display = "none";
     link.click();
 
-    console.log("✅ Downloaded successfully");
+    // console.log("✅ Downloaded successfully");
   } catch (err) {
     console.error("❌ Download error:", err);
     alert("Download failed.");
@@ -293,53 +292,54 @@ const IdCard = (props) => {
 };
 
   const printCanvas = async () => {
-    setLoading(true);
-    try {
-      if (!fabricCanvas) {
-        throw new Error("Canvas not found");
-      }
+  setLoading(true);
+  try {
+    if (!fabricCanvas) {
+      throw new Error("Canvas not found");
+    }
 
-      // Use upscale function with 10x preferred multiplier for high-quality print
-      const { dataURL, actualMultiplier } = await upscaleCanvas(
-        fabricCanvas,
-        10
-      );
+    // Use upscale function with 10x preferred multiplier for high-quality print
+    const { dataURL, actualMultiplier } = await upscaleCanvas(
+      fabricCanvas,
+      10
+    );
 
-      // Create a new window for printing
-      const printWindow = window.open("", "", "width=800,height=600");
+    // Create a new window for printing
+    const printWindow = window.open("", "", "width=800,height=600");
 
-      // Create an image element and set the high-res canvas data URL as the source
-      const printImage = new Image();
-      printImage.src = dataURL;
+    // Create an image element and set the high-res canvas data URL as the source
+    const printImage = new Image();
+    printImage.src = dataURL;
 
-      // Once the image is loaded, inject it into the print window and trigger the print
-      printImage.onload = () => {
-        printWindow.document.body.appendChild(printImage);
-        printWindow.document.body.style.textAlign = "center";
-        printWindow.document.body.style.margin = "0";
-        printWindow.document.body.style.padding = "0";
+    printImage.onload = () => {
+      printWindow.document.body.appendChild(printImage);
+      printWindow.document.body.style.textAlign = "center";
+      printWindow.document.body.style.margin = "0";
+      printWindow.document.body.style.padding = "0";
 
-        // Set print styles for high quality
-        const style = printWindow.document.createElement("style");
-        style.textContent = `
-          @media print {
-            body { margin: 0; padding: 0; }
-            img { max-width: 100%; height: auto; }
-          }
-        `;
-        printWindow.document.head.appendChild(style);
+      // Set print styles for high quality
+      const style = printWindow.document.createElement("style");
+      style.textContent = `
+        @media print {
+          body { margin: 0; padding: 0; }
+          img { max-width: 100%; height: auto; }
+        }
+      `;
+      printWindow.document.head.appendChild(style);
 
-        console.log(`Printing at ${actualMultiplier}x quality`);
+      // Wait a bit to ensure image is rendered before printing
+      setTimeout(() => {
         printWindow.print();
         printWindow.close();
-      };
-    } catch (error) {
-      console.error("Print error:", error);
-      alert("Failed to print ticket. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+      }, 300); // 300ms delay, adjust if needed
+    };
+  } catch (error) {
+    console.error("Print error:", error);
+    alert("Failed to print ticket. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <>
       <Row className="justify-content-center mb-2">
@@ -365,29 +365,43 @@ const IdCard = (props) => {
           )}
         </Col>
       </Row>
-      {loading ? (
+      <div
+        className="d-flex justify-content-center align-items-center w-100 my-3"
+        style={{ position: "relative" }}
+      >
         <div
-          style={{ display: "flex", justifyContent: "center", width: "100%" }}
+          style={{
+            border: "1px solid #ddd",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            display: "inline-block",
+            borderRadius: "12px",
+            overflow: "hidden",
+            position: "relative",
+          }}
         >
-          <Spinner animation="border" role="status">
-            <span className="sr-only">Loading...</span>
-          </Spinner>
+          <canvas ref={canvasRef} style={{ display: "block" }} />
+          {loading && (
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                background: "rgba(255,255,255,0.7)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 2,
+              }}
+            >
+              <Spinner animation="border" role="status">
+                <span className="sr-only">Loading...</span>
+              </Spinner>
+            </div>
+          )}
         </div>
-      ) : (
-        <div className="d-flex justify-content-center align-items-center w-100 my-3">
-          <div
-            style={{
-              border: "1px solid #ddd",
-              boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-              display: "inline-block",
-              borderRadius: "12px",
-              overflow: "hidden",
-            }}
-          >
-            <canvas ref={canvasRef} style={{ display: "block" }} />
-          </div>
-        </div>
-      )}
+      </div>
       <div style={{ display: "none" }}>
         <QRCodeCanvas ref={qrCodeRef} value={OrderId} size={150 * 3} />
       </div>
