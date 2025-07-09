@@ -362,7 +362,7 @@ const EditEvent = () => {
                 formData.append('state', state.value);
                 formData.append('city', city.value);
                 formData.append('description', description);
-                formData.append('customer_care_number', customerCareNumber);
+                // formData.append('customer_care_number', customerCareNumber);
 
                 formData.append('event_feature', eventFeature === true ? 1 : 0);
                 formData.append('status', status === true ? 1 : 0);

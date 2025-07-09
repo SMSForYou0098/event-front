@@ -8,8 +8,10 @@ import { useNavigate } from 'react-router-dom';
 import { CustomSelect } from '../../CustomComponents/CustomFormFields';
 import EventControls from './EventComponent/Forms/EventControls';
 import { customStyles } from '../../CustomComponents/select2';
+import { scanOption } from './EditEvent';
 const MakeEvent = () => {
-    const { api, UserList, authToken, userRole, UserData, EventCategory } = useMyContext();
+    const { api, UserList, authToken, userRole, UserData, EventCategory,ErrorAlert } = useMyContext();
+
     const navigate = useNavigate()
     const [validated, setValidated] = useState(false);
     const [users, setUsers] = useState([]);
@@ -44,8 +46,8 @@ const MakeEvent = () => {
             setUserId({ key: UserData?.id, label: UserData?.id })
             setIsOrganizer(true)
         }
-        setUsers(UserList)
-    }, []);
+        setUsers(UserList ?? [])
+    }, [UserList]);
 
     useEffect(() => {
         axios.post(`https://api.first.org/data/v1/countries`)
@@ -94,6 +96,22 @@ const MakeEvent = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         const form = event.currentTarget;
+         if (
+    !name ||
+    !category ||
+    !address ||
+    !description ||
+    !city ||
+    !state ||
+    (!isOrganizer && !userId)
+  ) {
+    setValidated(true);
+    ErrorAlert("Please fill all required fields.");
+    return;
+  }
+  if(!status ){
+    ErrorAlert("Note You Forgot On Event Status")
+  }
         if (form.checkValidity() === false) {
             event.stopPropagation();
         } else {
@@ -108,7 +126,7 @@ const MakeEvent = () => {
             formData.append('state', state);
             formData.append('city', city);
             formData.append('description', description);
-            formData.append('customer_care_number', customerCareNumber);
+            // formData.append('customer_care_number', customerCareNumber);
             //formData.append('status', status);
             formData.append('event_feature', eventFeature  === true ? 1 : 0);
             formData.append('status', status === true ? 1 : 0);
@@ -227,6 +245,21 @@ const MakeEvent = () => {
                                             />
                                         </Form.Group>
                                     </Col>
+                                    <Col md="4">
+                                        <Form.Group>
+                                            <Form.Label>UserData While Scan: *</Form.Label>
+                                            <Select
+                                                options={scanOption}
+                                                styles={customStyles}
+                                                value={scanDetail}
+                                                onChange={(data) => setScanDetail(data)}
+                                                // required
+                                            />
+                                            <Form.Control.Feedback tooltip>
+                                                Looks good!
+                                            </Form.Control.Feedback>
+                                        </Form.Group>
+                                    </Col>
                                     <Col md="12">
                                         <Form.Group>
                                             <Form.Label>Address: *</Form.Label>
@@ -248,7 +281,7 @@ const MakeEvent = () => {
                                             />
                                         </Form.Group>
                                     </Col>
-                                    <Col md="6">
+                                    {/* <Col md="6">
                                         <Form.Group>
                                             <Form.Label>Add Customer Care Number: *</Form.Label>
                                             <Form.Control
@@ -259,7 +292,7 @@ const MakeEvent = () => {
                                                 required
                                             />
                                         </Form.Group>
-                                    </Col>
+                                    </Col> */}
                                     <Row>
                                         <EventControls
                                             ticketSystem={ticketSystem}

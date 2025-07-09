@@ -90,7 +90,7 @@ const SlickBanners = () => {
         <div className="slick-banner" style={{
             maxWidth: '1980px',
             overflow: 'hidden',
-            margin: '0 auto',
+            margin: '3.5rem 0 auto',
             position: 'relative'
         }}>
             <Slider ref={sliderRef} {...settings}>
@@ -98,8 +98,9 @@ const SlickBanners = () => {
                         const bannerStyle = {
                             background: `url(${banner?.url}) no-repeat center center`,
                             backgroundSize: '100% 100%',  // This might cause stretching
-                            backgroundColor: '#000000',
-                            height: isMobile && '16rem',
+                            // backgroundColor: '#000000',
+                            backgroundColor: '#fff',
+                            height: isMobile ? '16rem' : '450px',
                             // height: isMobile ? '16rem' : 'auto',
                             maxWidth: isMobile ? '100%' : '1980px',
                             width: '100%',

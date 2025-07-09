@@ -348,7 +348,7 @@ const TicketByEvent = ({ eventId, eventName, showEventName }) => {
                 formData.append('ticket_title', ticketTitle);
                 formData.append('ticket_quantity', ticketQuantity);
                 formData.append('booking_per_customer', bookingPerCustomer);
-                formData.append('ticket_description', ticketDescription);
+                // formData.append('ticket_description', ticketDescription);
                 formData.append('taxes', taxes?.value);
                 formData.append('ticket_terms', ticketTerms);
                 formData.append('background_image', backgroundImage);
@@ -506,7 +506,7 @@ const TicketByEvent = ({ eventId, eventName, showEventName }) => {
                                         </div>
                                     </Col>
 
-                                    <Col md={24}>
+                                    {/* <Col md={24}>
                                         <div className="form-group">
                                             <label className="form-label">Description: *</label>
                                             <textarea
@@ -518,7 +518,7 @@ const TicketByEvent = ({ eventId, eventName, showEventName }) => {
                                                 onChange={(e) => setTicketDescription(e.target.value)}
                                             />
                                         </div>
-                                    </Col>
+                                    </Col> */}
 
                                     <Col md={3}>
                                         <div className="form-group">

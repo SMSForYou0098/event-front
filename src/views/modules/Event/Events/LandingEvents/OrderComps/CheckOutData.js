@@ -1,15 +1,15 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Row } from 'react-bootstrap';
 import BookingTickets from './BookingProcess.js/BookingTickets';
 import BookingSummary from './BookingProcess.js/BookingSummary';
 import DynamicAttendeeForm from './DynamicAttendeeForm';
 import UserSeatingCanvas from '../UserSeatingChart/UserSeatingCanvas';
 const CheckOutData = (props) => {
-    const { event, selectedTickets, currentStep, error, isMobile, resetCounterTrigger, getTicketCount, getCurrencySymbol, code, setCode, applyPromode, discount, appliedPromoCode, ticketCurrency, subtotal, handleRemovePromocode, totalDiscount, baseAmount, centralGST, totalTax, grandTotal, handlePayment, categoryData, attendeeState, setAttendeeState, isAttendeeRequired, AttendyView, setAttendees, setDisable, disable, getAttendees, bookingdate, loading, tickets } = props
+    const { event, selectedTickets, currentStep, error, isMobile, resetCounterTrigger, getTicketCount, getCurrencySymbol, code, setCode, applyPromode, discount, appliedPromoCode, ticketCurrency, subtotal, handleRemovePromocode, totalDiscount, baseAmount, centralGST, totalTax, grandTotal, handlePayment, categoryData, attendeeState, setAttendeeState, isAttendeeRequired, AttendyView, setAttendees, setDisable, disable, getAttendees, bookingdate, loading, tickets, isProceed, setIsProceed } = props
     return (
         <div id="checkout" className={`iq-product-tracker-card b-0 ${currentStep === 'checkout' ? 'show' : ''}`}>
             <Row>
-                {attendeeState ?
+                {attendeeState && !isProceed ?
                     <DynamicAttendeeForm
                         showAttendeeSuggetion={event?.online_att_sug === 0}
                         isAgent={false}
@@ -24,6 +24,7 @@ const CheckOutData = (props) => {
                         setAttendeeState={setAttendeeState}
                         selectedTickets={selectedTickets}
                         quantity={selectedTickets?.quantity}
+                        setIsProceed={setIsProceed}
                     />
                     :
                     parseInt(event?.ticket_system) === 1 ?
@@ -38,20 +39,31 @@ const CheckOutData = (props) => {
                             getCurrencySymbol={getCurrencySymbol}
                         />
                         :
-                        <BookingTickets
-                            event={event}
-                            tickets={tickets}
-                            bookingdate={bookingdate}
-                            error={error}
-                            isMobile={isMobile}
-                            resetCounterTrigger={resetCounterTrigger}
-                            getTicketCount={getTicketCount}
-                            selectedTickets={selectedTickets}
-                            getCurrencySymbol={getCurrencySymbol}
-                        />
-                }
+                        (
+          !isProceed && (
+            <BookingTickets
+              event={event}
+              tickets={tickets}
+              bookingdate={bookingdate}
+              error={error}
+              isMobile={isMobile}
+              resetCounterTrigger={resetCounterTrigger}
+              getTicketCount={getTicketCount}
+              selectedTickets={selectedTickets}
+              getCurrencySymbol={getCurrencySymbol}
+            />
+          )
+        )}
+
+                    
+
+            </Row>
+            <Row>
+
 
                 <BookingSummary
+                    setIsProceed={setIsProceed}
+                    isProceed={isProceed}
                     disable={disable}
                     code={code}
                     loading={loading}

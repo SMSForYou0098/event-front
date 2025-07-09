@@ -4,18 +4,22 @@ import { Link } from 'react-router-dom'
 import { useMyContext } from '../../../../../Context/MyContextProvider'
 
 const MobileCheckOut = (props) => {
-    const { ticketCurrency, handlePayment, grandTotal, isAttendeeRequired, disable, isAttendeeButton, attendees, quantity, attendeeState,loading } = props
+    const { ticketCurrency, handlePayment, grandTotal, isAttendeeRequired, disable, isAttendeeButton, attendees, quantity, attendeeState,loading, isProceed, setIsProceed } = props
     const { ErrorAlert } = useMyContext()
     const [buttonLabel, setButtonLabel] = useState('');
     useEffect(() => {
         if (isAttendeeRequired) {
             setButtonLabel('Next');
-        } else if (attendeeState && quantity && attendees && quantity === attendees) {
+        }
+        else if(attendeeState && !isProceed){
+            setButtonLabel('Proceed')
+        } 
+        else if (attendeeState && quantity && attendees && quantity === attendees) {
             setButtonLabel('Checkout & Next');
         } else {
             setButtonLabel('Checkout');
         }
-    }, [isAttendeeRequired, quantity, attendees]);
+    }, [isAttendeeRequired, quantity, attendees, isProceed]);
     return (
         <Container
             fluid
@@ -30,7 +34,20 @@ const MobileCheckOut = (props) => {
                 padding: '0',
             }}
             // onClick={() => console.log(disable)}
-            onClick={() => !loading && disable ? ErrorAlert(attendeeState && attendees !== quantity ? 'Attendees Must Be Same As Ticket Quantity' : 'Something Went Wrong') : handlePayment()}
+onClick={() => {
+  if (!loading && disable) {
+    const msg =
+      attendeeState && attendees !== quantity
+        ? 'Attendees Must Be Same As Ticket Quantity'
+        : 'Something Went Wrong';
+    return ErrorAlert(msg);
+  }
+  if (attendeeState && !isProceed) {
+    setIsProceed(true);
+  } else {
+    handlePayment();
+  }
+}}
         >
             {
                 isAttendeeButton ? (

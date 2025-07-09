@@ -253,7 +253,7 @@ const EventDetail = memo(() => {
                                                             onClick={() => !disable && handleBooking()}>
                                                             <Link
                                                                 disabled={disable}
-                                                                className="btn btn-warning d-flex align-items-center gap-2"
+                                                                className="btn btn-warning d-flex align-items-center gap-2" style={{backgroundColor:"#B85DE8"}}
                                                             >
                                                                 <span className="btn-inner d-flex ">
                                                                     <ShoppingCart />

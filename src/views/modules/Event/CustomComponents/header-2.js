@@ -51,7 +51,7 @@ const Header2 = memo(() => {
         // sticky="bottom"
         className="nav navbar navbar-expand-xl navbar-light iq-navbar header-hover-menu p-0"
         style={{
-          backgroundColor: '#17132E',
+          backgroundColor: '#B85DE8',
           boxShadow: isScrolled ? '0 4px 6px rgba(0, 0, 0, 0.1)' : 'none',
           transition: 'box-shadow 0.3s ease',
         }}
@@ -63,7 +63,7 @@ const Header2 = memo(() => {
                 src={logo}
                 alt="logo"
                 loading="lazy"
-                width={220}
+                width={130}
                 className="p-0"
                 onError={(e) => {
                   e.target.src = Dlogo;

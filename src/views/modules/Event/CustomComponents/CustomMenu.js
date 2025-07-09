@@ -136,6 +136,7 @@ const CustomMenu = ({ handleClose }) => {
                     <Link
                         target={menu?.new_tab === 1 ? "_blank" : "_self"}
                         className={getClassName(menu, location)}
+                        style={{color:'white'}}
                         to={getLinkTo(menu)}
                         onClick={() => CloseMenu()}
                     >
@@ -159,8 +160,8 @@ const CustomMenu = ({ handleClose }) => {
                     }}
                 >
                     <div style={{ cursor: 'pointer' }} className='d-flex align-items-center'>
-                        <MapPin size={16} color='grey' />
-                        <Link className={`nav-link `} o="#"> City </Link>
+                        <MapPin size={16} color='white' />
+                        <Link className={`nav-link `} style={{color:'white'}} o="#"> City </Link>
                     </div>
                 </Nav.Item>
                 <hr className="hr-horizontal" style={{ width: '35px', transform: 'rotate(90deg)' }} />

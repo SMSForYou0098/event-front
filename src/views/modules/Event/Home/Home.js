@@ -18,7 +18,8 @@ const Home = memo(() => {
        <MetaData/>
       {/* <Banners /> */}
       <SlickBanners />     
-      <div className="main bg-cover" style={{ background: `url(${cardBg})` }}>
+      <div style={{ background: `url(${cardBg})`,backgroundSize:'cover' }}>
+      <div className="main bg-cover">
         <div className="section-padding  py-2 pt-4">
           <Container fluid className="px-5">
             <FeatureEvent />
@@ -33,12 +34,14 @@ const Home = memo(() => {
           </Container>
         </div>
       </div>
-      <div className="py-3" style={{ background: `url(${CategoryBG})`, backgroundSize: 'cover' }}>
+      {/* <div className="py-3" style={{ background: `url(${CategoryBG})`, backgroundSize: 'cover' }}> */}
+      <div className="py-3" style={{ background: `transparent`, backgroundSize: 'cover' }}>
         {/* {isMobile ? 
         : 
         <EventsCategoryPC /> */}
-        <EventsCategoryMobile /> 
         {/* } */}
+        <EventsCategoryMobile /> 
+      </div>
       </div>
       {/* <div className="py-3 page-bg bg-cover" style={{ background: `url(${cardBg})` }}>
         <Container fluid className="px-5">

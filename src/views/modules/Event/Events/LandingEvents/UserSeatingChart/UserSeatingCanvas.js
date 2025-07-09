@@ -10,7 +10,7 @@ import SatMapSeats from './seatmapchart/seatmapchart'
 const UserSeatingCanvas = ({ error, event, isMobile, resetCounterTrigger, getTicketCount, selectedTickets, getCurrencySymbol, bookingdate }) => {
     const {successAlert,authToken,api,ErrorAlert} = useMyContext()
     return (
-        <Col lg="8">
+        <Col lg="12">
             {error &&
                 <Alert variant="danger d-flex align-items-center" role="alert">
                     <AlertCircle />

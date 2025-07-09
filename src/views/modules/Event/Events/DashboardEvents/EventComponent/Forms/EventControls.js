@@ -77,7 +77,7 @@ const EventControls = (props) => {
                     </Form.Check>
                 </Form.Group>
             </Col> */}
-            <Col md="4">
+            {/* <Col md="4">
                 <Form.Group>
                     <Form.Label>UserData While Scan: *</Form.Label>
                     <Select
@@ -91,7 +91,7 @@ const EventControls = (props) => {
                         Looks good!
                     </Form.Control.Feedback>
                 </Form.Group>
-            </Col>
+            </Col> */}
             <Col md="3">
                 <Form.Group className="form-group">
                     <Form.Label className="custom-file-input">&nbsp;</Form.Label>

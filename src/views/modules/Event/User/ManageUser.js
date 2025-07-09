@@ -864,6 +864,8 @@ const ManageUser = () => {
                                                         </Col>
                                                     </Row>
                                                 </Form>
+                                                {
+                                                    userRole !== 'User' && 
                                                 <Card className="border border-dashed border-2 shadow-none mb-0 rounded border-primary">
                                                     <div className="card-header">
                                                         <div className="d-flex justify-content-between align-items-center">
@@ -886,6 +888,7 @@ const ManageUser = () => {
                                                         </div>
                                                     </Card.Body>
                                                 </Card>
+                                                }
                                             </>
                                         )}
                                     </Tab.Pane>

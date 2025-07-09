@@ -10,11 +10,11 @@ import BookingsAttendee from './BookingsAttendee';
 import { processImageFile } from '../../../CustomComponents/AttendeeStroreUtils';
 
 const DynamicAttendeeForm = (props) => {
-    const { apiData, setAttendeeState, quantity, AttendyView, setAttendees, setDisable, category_id, getAttendees, isAgent, showAttendeeSuggetion,sucessAlert,selectedTickets } = props;
-    const { api, UserData } = useMyContext()
+    const { apiData, setAttendeeState, quantity, AttendyView, setAttendees, setDisable, category_id, getAttendees, isAgent, showAttendeeSuggetion,sucessAlert,selectedTickets, setIsProceed, disable } = props;
+    const { api, UserData, isMobile } = useMyContext()
     const [existingAttendee, setExistingAttendee] = useState([]);
     const [attendeeList, setAttendeesList] = useState([]);
-    const [attendeeData, setAttendeeData] = useState({});
+    const [attendeeData, setAttendeeData] = useState({});   
     const [showModal, setShowModal] = useState(false);
     const [editingIndex, setEditingIndex] = useState(null);
     const [ShowAction, setShowAction] = useState(true);
@@ -153,7 +153,7 @@ const DynamicAttendeeForm = (props) => {
                 { ...attendeeData, missingFields }
             ]);
         }
-        setAttendeeData({});
+        // setAttendeeData({});
         handleCloseModal();
     };
 
@@ -396,7 +396,7 @@ const DynamicAttendeeForm = (props) => {
     const [showAddAttendeeModal, setShowAddAttendeeModal] = useState(false);
 
     return (
-        <Col lg="8">
+        <Col lg="12">
             <>
                 <Card className="mb-4">
                     <Card.Header className="d-flex justify-content-between align-items-center">
@@ -470,6 +470,7 @@ const DynamicAttendeeForm = (props) => {
                     </Card.Footer>
                 )} */}
             </>
+            {!isMobile && <Button disabled={disable} onClick={()=>setIsProceed(true)}>Proceed</Button>}
         </Col>
     );
 };

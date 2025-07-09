@@ -4,6 +4,7 @@ import { Button, Col, Form, InputGroup, Row } from 'react-bootstrap'
 import Select from 'react-select'
 import { useMyContext } from '../../../../../../../Context/MyContextProvider'
 import EventControls from './EventControls'
+import { scanOption } from '../../EditEvent'
 const Detail = (props) => {
     const { validated, UpdateEvent, userRole, userId, customStyles, setUserId, categoryList, category, setCategory, handleSelectValue, name, setName, states, state, setState, cities, city, setCity, address, setAddress, description, setDescription, customerCareNumber, setCustomerCareNumber, eventFeature, setEventFeature, status, setStatus, houseFull, setHouseFull, smsOtpCheckout, setSmsOtpCheckout, show, mutiScan, setMultiScan, setOfflineAttSug, setOnlineAttSug, onlineAttSug, offlineAttSug, scanDetail, setScanDetail,setTicketSystem,ticketSystem } = props
     const { UserList } = useMyContext()
@@ -66,6 +67,7 @@ const Detail = (props) => {
                                 </InputGroup>
                             </Form.Group>
                         </Col>
+                        
                         {/* <Col md="4">
                             <Form.Group>
                                 <Form.Label>Country: *</Form.Label>
@@ -103,6 +105,21 @@ const Detail = (props) => {
                                 />
                             </Form.Group>
                         </Col>
+                        <Col md="4">
+                                        <Form.Group>
+                                            <Form.Label>UserData While Scan: *</Form.Label>
+                                            <Select
+                                                options={scanOption}
+                                                styles={customStyles}
+                                                value={scanDetail}
+                                                onChange={(data) => setScanDetail(data)}
+                                                // required
+                                            />
+                                            <Form.Control.Feedback tooltip>
+                                                Looks good!
+                                            </Form.Control.Feedback>
+                                        </Form.Group>
+                                    </Col>
                         <Col md="12">
                             <Form.Group>
                                 <Form.Label>Address: *</Form.Label>

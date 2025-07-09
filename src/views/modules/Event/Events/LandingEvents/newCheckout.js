@@ -60,6 +60,8 @@ const NewChekout = memo(() => {
     const [discountType, setDiscountType] = useState();
     const [isExpired, setIsExpired] = useState(false);
     const [tikcets, setTikcets] = useState([]);
+    const [isProceed,setIsProceed] = useState(false)
+    
     const getTicketData = async () => {
         setLoading(true);
         await axios.get(`${api}event-detail/${id}`, {
@@ -743,6 +745,8 @@ const NewChekout = memo(() => {
                                 attendeeState={attendeeState}
                                 attendees={selectedAttendees}
                                 quantity={selectedTickets?.quantity}
+                                isProceed={isProceed}
+                                setIsProceed={setIsProceed}
                             />
                         }
 
@@ -788,6 +792,8 @@ const NewChekout = memo(() => {
                                     grandTotal={grandTotal}
                                     handlePayment={handlePayment}
                                     isAttendeeRequired={isAttendeeRequired}
+                                    isProceed={isProceed}
+                                    setIsProceed={setIsProceed}
                                 />
                         }
                         {

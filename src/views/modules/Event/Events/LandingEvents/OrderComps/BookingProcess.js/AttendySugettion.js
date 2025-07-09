@@ -60,7 +60,7 @@ const AttendySugettion = (props) => {
       }, [searchTerm, data]);
       
     return (
-        <Modal show={showAddAttendeeModal} onHide={() => HandleClose()} size='xl'>
+        <Modal show={showAddAttendeeModal} onHide={() => HandleClose()} size='xl' centered >
             <Modal.Header>
                 <div className="d-flex justify-content-between w-100">
                     <div>
@@ -128,9 +128,12 @@ const AttendySugettion = (props) => {
                                                     <p>
                                                         <strong>Number:</strong> {attendee?.Mo}
                                                     </p>
+                                                    {
+                                                        attendee?.Email && 
                                                     <p>
-                                                        <strong>Name:</strong> {attendee?.Email}
+                                                        <strong>Email:</strong> {attendee?.Email}
                                                     </p>
+                                                    }
                                                 </div>
                                             </div>
                                         </div>

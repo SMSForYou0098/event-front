@@ -1,3 +1,4 @@
+import { ArrowLeft } from 'lucide-react';
 import React from 'react'
 import { Alert, Badge, Button, Card, Col, TabPane } from 'react-bootstrap'
 
@@ -19,39 +20,28 @@ const BookingSummary = ({
     handlePayment,
     isAttendeeRequired,
     disable,
-    loading
+    loading,
+    setIsProceed,
+    isProceed
 }) => {
     return (
-        <Col lg="4">
-            <Card>
+<Col lg="4" className="mx-auto text-center">
+            {
+                !isAttendeeRequired && isProceed &&
+                <Card className="position-relative">
+                <Button
+    variant="light"
+    onClick={() => setIsProceed(false)}
+    className="position-absolute start-0 top-0 m-2 d-flex align-items-center gap-1"
+  >
+    <ArrowLeft size={16} />
+    
+  </Button>
                 <div className="card-header">
                     <h4 className="mb-0">Booking Summary</h4>
                 </div>
                 <Card.Body>
-                    <div className="border-bottom">
-                        <div className="input-group mb-3">
-                            <input
-                                type="text"
-                                className="form-control"
-                                placeholder="PROMO CODE"
-                                aria-label="Promo Code"
-                                aria-describedby="PromoCode"
-                                value={code}
-                                onChange={(e) => {
-                                    const sanitizedValue = e.target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
-                                    setCode(sanitizedValue);
-                                }}
-                            />
-                            <Button
-                                className="btn btn-primary"
-                                type="button"
-                                id="CouponCode"
-                                onClick={() => applyPromode()}
-                            >
-                                Apply
-                            </Button>
-                        </div>
-                    </div>
+                    
                     <div className="border-bottom mt-4">
                         {
                             discount !== 0 &&
@@ -97,6 +87,30 @@ const BookingSummary = ({
                             <h6 className="text-success">{ticketCurrency}{totalTax}</h6>
                         </div>
                     </div>
+                    <div className="border-bottom">
+                        <div className="input-group mb-3">
+                            <input
+                                type="text"
+                                className="form-control"
+                                placeholder="PROMO CODE"
+                                aria-label="Promo Code"
+                                aria-describedby="PromoCode"
+                                value={code}
+                                onChange={(e) => {
+                                    const sanitizedValue = e.target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+                                    setCode(sanitizedValue);
+                                }}
+                            />
+                            <Button
+                                className="btn btn-primary"
+                                type="button"
+                                id="CouponCode"
+                                onClick={() => applyPromode()}
+                            >
+                                Apply
+                            </Button>
+                        </div>
+                    </div>
                     <div className="mt-4">
                         <div className="d-flex justify-content-between mb-4">
                             <h6 className="mb-0">Order Total</h6>
@@ -115,8 +129,12 @@ const BookingSummary = ({
                                 </h6>
                             </div>
                         </div>
+                    </div>
+                </Card.Body>
+            </Card>
+            }
                         {
-                            !isMobile &&
+                            !isMobile && isAttendeeRequired &&
                             <div className="d-flex">
                                 <Button
                                     id="place-order"
@@ -126,13 +144,24 @@ const BookingSummary = ({
                                     onClick={() => handlePayment()}
                                     variant="primary d-block mt-3 next w-100"
                                 >
-                                    {isAttendeeRequired ? 'Next' : 'Checkout'}
+                                    Next
                                 </Button>
                             </div>
                         }
-                    </div>
-                </Card.Body>
-            </Card>
+                        {
+                            !isMobile && isProceed && <div className="d-flex">
+                                <Button
+                                    id="place-order"
+                                    to="#"
+                                    disabled={disable || loading}
+                                    // onClick={handleBooking}
+                                    onClick={() => handlePayment()}
+                                    variant="primary d-block mt-3 next w-100"
+                                >
+                                    CheckOut
+                                </Button>
+                            </div>
+                        }
         </Col>
     )
 }
