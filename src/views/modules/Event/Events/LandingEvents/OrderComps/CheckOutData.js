@@ -82,6 +82,7 @@ const CheckOutData = (props) => {
                     grandTotal={grandTotal}
                     isMobile={isMobile}
                     handlePayment={handlePayment}
+                    ticketCount={selectedTickets?.quantity}
                 />
             </Row>
         </div>

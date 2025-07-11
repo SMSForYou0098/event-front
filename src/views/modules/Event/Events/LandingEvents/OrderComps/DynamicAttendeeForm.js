@@ -396,7 +396,7 @@ const DynamicAttendeeForm = (props) => {
     const [showAddAttendeeModal, setShowAddAttendeeModal] = useState(false);
 
     return (
-        <Col lg="12">
+        <Col lg="4" className="mx-auto text-center">
             <>
                 <Card className="mb-4">
                     <Card.Header className="d-flex justify-content-between align-items-center">

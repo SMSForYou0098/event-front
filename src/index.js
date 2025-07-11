@@ -10,6 +10,7 @@ import { store, persistor } from './store';
 import Home from "./views/modules/Event/Home/Home";
 import DefaultLayout from "./views/modules/Event/layouts/default-layout";
 import { LandingModulesRouter } from "./views/modules/Event/CutomRoutes/landing-modules-router";
+import { BlogsRouter } from "./views/modules/blogs/router/BlogsRouter";
 const router = createBrowserRouter(
   [
     {
@@ -22,6 +23,7 @@ const router = createBrowserRouter(
         }
       ]
     },
+    ...BlogsRouter,
     ...IndexRouters,
     ...LandingModulesRouter
   ],

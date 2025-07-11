@@ -22,26 +22,38 @@ const BookingSummary = ({
     disable,
     loading,
     setIsProceed,
-    isProceed
+    isProceed,
+    ticketCount
 }) => {
     return (
 <Col lg="4" className="mx-auto text-center">
             {
                 !isAttendeeRequired && isProceed &&
                 <Card className="position-relative">
-                <Button
-    variant="light"
-    onClick={() => setIsProceed(false)}
-    className="position-absolute start-0 top-0 m-2 d-flex align-items-center gap-1"
-  >
-    <ArrowLeft size={16} />
-    
-  </Button>
-                <div className="card-header">
-                    <h4 className="mb-0">Booking Summary</h4>
-                </div>
+                
+                <div className="d-flex mt-3 justify-content-center">
+  <h5 className="mb-0">Booking Summary</h5>
+</div>
+
                 <Card.Body>
-                    
+                   <Alert variant="success d-flex flex-column" role="alert"
+  className=" text-center  rounded  "
+//   style={{ margin: '0 auto', backgroundColor: '#f9f9f9' }}
+>
+  <div className='' style={{ fontSize: '10px' }}>
+    <p style={{margin:0,padding:0}}><strong>E-Ticket Terms and Conditions</strong></p>
+  <p style={{margin:0,padding:0}}><em>E-Ticket saves the planet. Go for eco-clean.</em></p>
+
+  <ol className="text-start d-inline-block text-wrap" style={{ maxWidth: '600px' }}>
+    <li>Customers can access their tickets from the <strong>"My Profile"</strong> section on the mobile web. Plz download E-ticket Befor Visit to event Venue</li>
+    <li>It is mandatory to present the ticket at the venue.</li>
+    <li>No physical tickets are required to enter the venue.</li>
+  </ol>
+  </div>
+</Alert>
+
+
+
                     <div className="border-bottom mt-4">
                         {
                             discount !== 0 &&
@@ -62,27 +74,31 @@ const BookingSummary = ({
                                 </TabPane>
                             </div>
                         }
-                        <div className="d-flex justify-content-between mb-4">
+                        <div className="d-flex justify-content-between mb-1">
                             <h6>Sub Total</h6>
                             <h6 className="text-primary">{ticketCurrency}{subtotal}</h6>
                         </div>
-                        <div className="d-flex justify-content-between mb-4">
+                        <div className="d-flex justify-content-between mb-1">
+                            <h6>Total Tickets</h6>
+                            <h6 className="text-primary">{ticketCount}</h6>
+                        </div>
+                        <div className="d-flex justify-content-between mb-1">
                             <h6>Discount</h6>
                             <h6 className="text-success">{ticketCurrency}{totalDiscount}</h6>
                         </div>
-                        <div className="d-flex justify-content-between mb-4">
+                        <div className="d-flex justify-content-between mb-1">
                             <h6>Base Amount</h6>
                             <h6 className="text-success">{ticketCurrency}{baseAmount}</h6>
                         </div>
-                        <div className="d-flex justify-content-between mb-4">
+                        <div className="d-flex justify-content-between mb-1">
                             <h6>Central GST (CGST) @ 9%</h6>
                             <h6 className="text-success">{ticketCurrency}{centralGST}</h6>
                         </div>
-                        <div className="d-flex justify-content-between mb-4">
+                        <div className="d-flex justify-content-between mb-1">
                             <h6>State GST (SGST) @ 9%</h6>
                             <h6 className="text-success">{ticketCurrency}{centralGST}</h6>
                         </div>
-                        <div className="d-flex justify-content-between mb-4">
+                        <div className="d-flex justify-content-between mb-1">
                             <h6>Convenience fees</h6>
                             <h6 className="text-success">{ticketCurrency}{totalTax}</h6>
                         </div>
@@ -133,35 +149,58 @@ const BookingSummary = ({
                 </Card.Body>
             </Card>
             }
-                        {
-                            !isMobile && isAttendeeRequired &&
-                            <div className="d-flex">
-                                <Button
-                                    id="place-order"
-                                    to="#"
-                                    disabled={disable || loading}
-                                    // onClick={handleBooking}
-                                    onClick={() => handlePayment()}
-                                    variant="primary d-block mt-3 next w-100"
-                                >
-                                    Next
-                                </Button>
-                            </div>
-                        }
-                        {
-                            !isMobile && isProceed && <div className="d-flex">
-                                <Button
-                                    id="place-order"
-                                    to="#"
-                                    disabled={disable || loading}
-                                    // onClick={handleBooking}
-                                    onClick={() => handlePayment()}
-                                    variant="primary d-block mt-3 next w-100"
-                                >
-                                    CheckOut
-                                </Button>
-                            </div>
-                        }
+            {
+  !isMobile && isAttendeeRequired &&
+  <div className="d-flex justify-content-between align-items-center mt-3 px-3">
+    {/* Left Arrow */}
+    <Button
+      variant="light"
+      onClick={() => setIsProceed(false)}
+      className="d-flex align-items-center gap-1"
+    >
+      <ArrowLeft size={16} />
+      Back
+    </Button>
+
+    {/* Next Button */}
+    <Button
+      id="place-order"
+      disabled={disable || loading}
+      onClick={handlePayment}
+      variant="primary"
+      style={{ padding: '0.5rem 2rem' }}
+    >
+      Next
+    </Button>
+  </div>
+}
+
+{
+  !isMobile && isProceed &&
+  <div className="d-flex justify-content-between align-items-center mt-3 px-3">
+    {/* Left Arrow */}
+    <Button
+      variant="light"
+      onClick={() => setIsProceed(false)}
+      className="d-flex align-items-center gap-1"
+    >
+      <ArrowLeft size={16} />
+      Back
+    </Button>
+
+    {/* Checkout Button */}
+    <Button
+      id="place-order"
+      disabled={disable || loading}
+      onClick={handlePayment}
+      variant="primary"
+      style={{ padding: '0.5rem 2rem' }}
+    >
+      Checkout
+    </Button>
+  </div>
+}
+
         </Col>
     )
 }

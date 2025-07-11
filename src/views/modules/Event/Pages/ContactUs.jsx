@@ -96,7 +96,7 @@ const ContactUs = () => {
                 <Row>
                   <Col md={6} className="mb-3">
                     <Form.Group controlId="contactName">
-                      <Form.Label>
+                      <Form.Label className="text-dark">
                         Your Name <span className="text-danger">*</span>
                       </Form.Label>
                       <Form.Control
@@ -105,6 +105,7 @@ const ContactUs = () => {
                         name="name"
                         value={form.name}
                         onChange={handleChange}
+                        className="text-dark"
                         required
                       />
                       <Form.Control.Feedback type="invalid">
@@ -114,13 +115,14 @@ const ContactUs = () => {
                   </Col>
                   <Col md={6} className="mb-3">
                     <Form.Group controlId="contactEmail">
-                      <Form.Label>Email</Form.Label>
+                      <Form.Label className="text-dark">Email</Form.Label>
                       <Form.Control
                         type="email"
                         placeholder="you@example.com"
                         name="email"
                         value={form.email}
                         onChange={handleChange}
+                        className="text-dark"
                       />
                     </Form.Group>
                   </Col>
@@ -128,11 +130,12 @@ const ContactUs = () => {
                 <Row>
                   <Col md={6} className="mb-3">
                     <Form.Group controlId="contactPhone">
-                      <Form.Label>
+                      <Form.Label className="text-dark">
                         Phone Number <span className="text-danger">*</span>
                       </Form.Label>
                       <Form.Control
                         type="text"
+                        className="text-dark"
                         placeholder="e.g. +919876543210"
                         name="phone"
                         value={form.phone}
@@ -146,13 +149,14 @@ const ContactUs = () => {
                   </Col>
                   <Col md={6} className="mb-3">
                     <Form.Group controlId="contactSubject">
-                      <Form.Label>Subject</Form.Label>
+                      <Form.Label className="text-dark">Subject</Form.Label>
                       <Form.Control
                         type="text"
                         placeholder="Subject"
                         name="subject"
                         value={form.subject}
                         onChange={handleChange}
+                        className="text-dark"
                       />
                     </Form.Group>
                   </Col>
@@ -160,7 +164,7 @@ const ContactUs = () => {
                 <Row>
                   <Col md={12} className="mb-3">
                     <Form.Group controlId="contactAddress">
-                      <Form.Label>Address</Form.Label>
+                      <Form.Label className="text-dark">Address</Form.Label>
                       <Form.Control
                         as="textarea"
                         rows={2}
@@ -168,15 +172,17 @@ const ContactUs = () => {
                         name="address"
                         value={form.address}
                         onChange={handleChange}
+                        className="text-dark"
                       />
                     </Form.Group>
                   </Col>
                 </Row>
                 <Form.Group className="mb-3" controlId="contactMessage">
-                  <Form.Label>
+                  <Form.Label className="text-dark">
                     Message <span className="text-danger">*</span>
                   </Form.Label>
                   <Form.Control
+                  className="text-dark"
                     as="textarea"
                     rows={2}
                     placeholder="Tell us about your query..."
@@ -190,13 +196,14 @@ const ContactUs = () => {
                   </Form.Control.Feedback>
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="contactScreenshot">
-                  <Form.Label>Attach Screenshot</Form.Label>
+                  <Form.Label className="text-dark">Attach Screenshot</Form.Label>
                   <Form.Control
                     type="file"
                     accept="image/*"
                     name="screenshot"
                     onChange={handleChange}
                     ref={screenshotRef}
+                    className="text-dark"
                   />
                 </Form.Group>
                 {success && (
@@ -211,7 +218,7 @@ const ContactUs = () => {
                 <Button
                   variant="primary"
                   type="submit"
-                  style={{ background: "rgb(23, 19, 46)", border: "none" }}
+                  // style={{ background: "rgb(23, 19, 46)", border: "none" }}
                   className="w-100 mt-2"
                   disabled={submitting}
                 >
@@ -232,8 +239,8 @@ const ContactUs = () => {
             <Card
               className="p-4"
               style={{
-                background: "rgb(23, 19, 46)",
-                color: "#fff",
+                background: "rgb(23, 19, 46,0.1)",
+                color: "#000",
                 border: "none",
               }}
             >

@@ -22,7 +22,11 @@ const AdminSetting = () => {
     const [notifyReq, setNotifyReq] = useState('');
     const [complimentaryValidation, setComplimentaryValidation] = useState(false);
     const [mobileLogo, setMobileLogo] = useState('');
-
+    const [homeDividerData, setHomeDividerData] = useState({
+        home_divider:'',
+        home_divider_url:''
+    });
+    
 
     const GetMailConfig = async () => {
         try {
@@ -46,6 +50,10 @@ const AdminSetting = () => {
                 setCopyrightLink(configData?.copyright_link || '');
                 setComplimentaryValidation(configData?.complimentary_attendee_validation === 1);
                 setNotifyReq(configData?.notify_req || '');
+                setHomeDividerData({
+                    home_divider:configData?.home_divider,
+                    home_divider_url:configData?.home_divider_url,
+                })
             }
         } catch (err) {
             // console.log(err);
@@ -85,6 +93,8 @@ const AdminSetting = () => {
             formData.append('mo_logo', mobileLogo);
             formData.append('auth_logo', authLogo);
             formData.append('favicon', favicon);
+            formData.append('home_divider',homeDividerData.home_divider)
+            formData.append('home_divider_url',homeDividerData.home_divider_url)
             formData.append('complimentary_attendee_validation', complimentaryValidation ? 1 : 0);
             formData.append('notify_req', notifyReq ? 1 : 0);
             const res = await axios.post(`${api}setting`, formData, {
@@ -131,6 +141,8 @@ const AdminSetting = () => {
                                         setMissedCallNumber={setMissedCallNumber}
                                         setNotifyReq={setNotifyReq}
                                         notifyReq={notifyReq}
+                                        homeDividerData={homeDividerData}
+                                        setHomeDividerData={setHomeDividerData}
                                     />
                                     {/* -----------------SEO------------------ */}
                                     <hr className="hr-horizontal" />

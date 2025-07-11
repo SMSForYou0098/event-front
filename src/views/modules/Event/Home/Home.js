@@ -11,6 +11,7 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import SlickBanners from "./Sections/SlickBanners";
+import HomeDivider from "../Events/LandingEvents/HomeDivider";
 
 const Home = memo(() => {
   return (
@@ -40,6 +41,7 @@ const Home = memo(() => {
         : 
         <EventsCategoryPC /> */}
         {/* } */}
+        <HomeDivider />
         <EventsCategoryMobile /> 
       </div>
       </div>

@@ -130,9 +130,10 @@ const StaticMissedCall = () => {
     setShowMissedCallNumber((prev) => !prev);
   };
   const navbarStyle = {
-    background: navbarScrolled
-      ? 'rgba(0, 0, 0, 0.8)'
-      : 'rgba(0, 0, 0, 0.5)',
+    // background: navbarScrolled
+    //   ? 'rgba(0, 0, 0, 0.8)'
+    //   : 'rgba(0, 0, 0, 0.5)',
+    background:'#B85DE8',
     transition: 'background 0.3s ease',
     position: 'fixed',
     width: '100%',
