@@ -44,6 +44,7 @@ const NewUser = memo(() => {
     const [gates, setGates] = useState([]);
     const [selectedGates, setSelectedGates] = useState([]);
 
+
     //role
     const RoleData = async () => {
         try {

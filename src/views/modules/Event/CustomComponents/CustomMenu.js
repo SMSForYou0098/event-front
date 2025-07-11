@@ -13,7 +13,7 @@ import { MapPin } from 'lucide-react';
 const CustomMenu = ({ handleClose }) => {
     const { UserData, userRole, isMobile, api, createSlug } = useMyContext();
     let location = useLocation();
-    const home = userRole === 'User' ? 'dashboard/bookings' : 'dashboard'
+    const home = userRole === 'User' ? '/dashboard/bookings' : '/dashboard'
     const CloseMenu = () => {
         if (handleClose) {
             handleClose()

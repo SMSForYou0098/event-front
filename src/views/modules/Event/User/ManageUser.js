@@ -57,6 +57,7 @@ const ManageUser = () => {
     const [selectedGates, setSelectedGates] = useState([]);
     const [ticketGroup, setTicketGroup] = useState([]);
     const [selectedTickets, setSelectedTickets] = useState([]);
+    const [agreementStatus,setAgreementStatus] = useState(false)
     const UserDetail = async (source) => {
         if (errorTimeout) {
             clearTimeout(errorTimeout);
@@ -105,6 +106,7 @@ const ManageUser = () => {
                     setShopNumber(data?.shop?.shop_no || '');
                     setGstNumber(data?.shop?.gst_no || '');
                     setSelectedTickets(data?.tickets || []);
+                    setAgreementStatus(data?.agreement_status)
                     if (data.reporting_user_id) {
                         await fetchUserRole(data.reporting_user_id, source);
                     }
@@ -337,7 +339,8 @@ const ManageUser = () => {
                 status: status === 'Active' ? 1 : 0,
                 agent_disc: agentDiscount ? 1 : 0,
                 events: (roleName === 'Agent' || roleName === 'Sponsor' || roleName === 'Accreditation') ? selectedEvents.map(event => event.value) : [],
-                tickets: selectedTickets
+                tickets: selectedTickets,
+                agreement_status:agreementStatus
             };
             try {
                 const response = await axios.post(`${api}update-user/${id}`, userData, {
@@ -541,6 +544,16 @@ const ManageUser = () => {
                                                                             onChange={(e) => setEmail(e.target.value)}
                                                                         />
                                                                     </Form.Group>
+                                                                    <Form.Group className="col-md-3 form-group">
+                                                                        <Form.Label htmlFor="agreementSwitch">Agreement Status:</Form.Label>
+                                                                        <Form.Check
+                                                                            type="switch"
+                                                                            id="agreementSwitch"
+                                                                            checked={agreementStatus}
+                                                                            onChange={(e) => setAgreementStatus(e.target.checked)}
+                                                                            label={agreementStatus ? "Active" : "Inactive"}
+                                                                        />
+                                                                        </Form.Group>
                                                                     <Form.Group className="col-md-3 form-group">
                                                                         <Form.Label htmlFor="mobno">Mobile Number:</Form.Label>
                                                                         <Form.Control

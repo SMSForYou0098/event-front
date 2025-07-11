@@ -24,8 +24,14 @@ const AdminSetting = () => {
     const [mobileLogo, setMobileLogo] = useState('');
     const [homeDividerData, setHomeDividerData] = useState({
         home_divider:'',
-        home_divider_url:''
+        home_divider_url:'',
+        external_link:false,
+        new_tab:false
     });
+    const [agreementData,setAgreementData] = useState({
+        agreement_pdf:"",
+        e_signature:"",
+    })
     
 
     const GetMailConfig = async () => {
@@ -50,9 +56,19 @@ const AdminSetting = () => {
                 setCopyrightLink(configData?.copyright_link || '');
                 setComplimentaryValidation(configData?.complimentary_attendee_validation === 1);
                 setNotifyReq(configData?.notify_req || '');
+                let parsedDividerUrl = {};
+                parsedDividerUrl = configData?.home_divider_url
+                  ? JSON.parse(configData.home_divider_url)
+                  : {};
                 setHomeDividerData({
-                    home_divider:configData?.home_divider,
-                    home_divider_url:configData?.home_divider_url,
+                  home_divider: configData?.home_divider || "",
+                  home_divider_url: parsedDividerUrl.url || "",
+                  external_link: parsedDividerUrl.external_link || false,
+                  new_tab: parsedDividerUrl.new_tab || false,
+                });
+                setAgreementData({
+                    agreement_pdf:configData?.agreement_pdf,
+                    e_signature:configData?.e_signature
                 })
             }
         } catch (err) {
@@ -94,7 +110,17 @@ const AdminSetting = () => {
             formData.append('auth_logo', authLogo);
             formData.append('favicon', favicon);
             formData.append('home_divider',homeDividerData.home_divider)
-            formData.append('home_divider_url',homeDividerData.home_divider_url)
+            formData.append(
+              "home_divider_url",
+              JSON.stringify({
+                url: homeDividerData.home_divider_url,
+                external_link: homeDividerData.external_link,
+                new_tab: homeDividerData.new_tab,
+              })
+            );
+            formData.append('agreement_pdf', agreementData?.agreement_pdf);
+            formData.append('e_signature', agreementData?.e_signature);
+
             formData.append('complimentary_attendee_validation', complimentaryValidation ? 1 : 0);
             formData.append('notify_req', notifyReq ? 1 : 0);
             const res = await axios.post(`${api}setting`, formData, {
@@ -143,6 +169,8 @@ const AdminSetting = () => {
                                         notifyReq={notifyReq}
                                         homeDividerData={homeDividerData}
                                         setHomeDividerData={setHomeDividerData}
+                                        agreementData={agreementData}
+                                        setAgreementData={setAgreementData}
                                     />
                                     {/* -----------------SEO------------------ */}
                                     <hr className="hr-horizontal" />
