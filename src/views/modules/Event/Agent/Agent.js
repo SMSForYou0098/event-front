@@ -71,6 +71,7 @@ const Agent = memo(({ isSponser = false, isAccreditation = false }) => {
     const handleShowDateModal = () => setShowDateModal(true);
     const [selectedDate, setSelectedDate] = useState(null);
     const [isAmusment, setIsAmusment] = useState(false);
+    const [isProceed,setIsProceed] = useState(false)
 
     const getUserTickets = useCallback(async () => {
         if (isAccreditation) {
@@ -670,6 +671,7 @@ const Agent = memo(({ isSponser = false, isAccreditation = false }) => {
                         }
                     }
                     setIsCheckOut(false);
+                    navigate('/dashboard/agent-bookings')
                 }
             } catch (err) {
                 setShowDateModal(false);
@@ -786,6 +788,8 @@ const Agent = memo(({ isSponser = false, isAccreditation = false }) => {
                     attendeeState={attendeeState}
                     attendees={selectedAttendees}
                     quantity={selectedTickets?.quantity}
+                    setIsProceed={setIsProceed}
+                    isProceed={isProceed}
                 />
             }
             <Row>
@@ -798,7 +802,8 @@ const Agent = memo(({ isSponser = false, isAccreditation = false }) => {
                 </Col>
             </Row>
             <Row>
-                {attendeeState ? (
+                {(!isMobile || !isProceed) && (
+  attendeeState ? (
                     <DynamicAttendeeForm
                         showAttendeeSuggetion={event?.offline_att_sug === 0}
                         isAgent={true}
@@ -813,6 +818,7 @@ const Agent = memo(({ isSponser = false, isAccreditation = false }) => {
                         setAttendeeState={setAttendeeState}
                         selectedTickets={selectedTickets}
                         quantity={selectedTickets?.quantity}
+                        setIsProceed={setIsProceed}
                     />
                 ) : (event?.category?.title !== 'Amusement' || (event?.category?.title === 'Amusement' && isDateSelected)) && (
                     <Col lg="8">
@@ -856,7 +862,7 @@ const Agent = memo(({ isSponser = false, isAccreditation = false }) => {
                             }
                         </Card>
                     </Col>
-                )}
+))}
                 {(event?.category?.title !== 'Amusement' || (event?.category?.title === 'Amusement' && isDateSelected)) && (
                     <Col lg="4">
                         <AgentBookingSummary
@@ -879,6 +885,9 @@ const Agent = memo(({ isSponser = false, isAccreditation = false }) => {
                             HandleBookingModel={HandleBookingModel}
                             isMobile={isMobile}
                             isAttendeeRequired={isAttendeeRequired}
+                            ticketCount={selectedTickets?.quantity}
+                            setIsProceed={setIsProceed}
+                            isProceed={isProceed}
                         />
                     </Col>
                 )}

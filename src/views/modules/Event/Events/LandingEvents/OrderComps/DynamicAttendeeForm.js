@@ -8,13 +8,14 @@ import { PlusIcon } from 'lucide-react';
 import Swal from 'sweetalert2';
 import BookingsAttendee from './BookingsAttendee';
 import { processImageFile } from '../../../CustomComponents/AttendeeStroreUtils';
+import { toast } from 'react-toastify';
 
 const DynamicAttendeeForm = (props) => {
-    const { apiData, setAttendeeState, quantity, AttendyView, setAttendees, setDisable, category_id, getAttendees, isAgent, showAttendeeSuggetion,sucessAlert,selectedTickets, setIsProceed, disable } = props;
-    const { api, UserData, isMobile } = useMyContext()
+    const { apiData, setAttendeeState, quantity, AttendyView, setAttendees, setDisable, category_id, getAttendees, isAgent, showAttendeeSuggetion,selectedTickets, setIsProceed, disable } = props;
+    const { api, UserData, isMobile, successAlert } = useMyContext()
     const [existingAttendee, setExistingAttendee] = useState([]);
     const [attendeeList, setAttendeesList] = useState([]);
-    const [attendeeData, setAttendeeData] = useState({});   
+    const [attendeeData, setAttendeeData] = useState({});
     const [showModal, setShowModal] = useState(false);
     const [editingIndex, setEditingIndex] = useState(null);
     const [ShowAction, setShowAction] = useState(true);
@@ -174,7 +175,7 @@ const DynamicAttendeeForm = (props) => {
                 const updatedList = attendeeList?.filter((_, i) => i !== index);
                 setAttendeesList(updatedList);
                 setAttendees(updatedList);
-                sucessAlert('The attendee has been deleted.');
+                successAlert('The attendee has been deleted.');
             } else {
                 Swal.fire(
                     'Cancelled',
@@ -396,7 +397,7 @@ const DynamicAttendeeForm = (props) => {
     const [showAddAttendeeModal, setShowAddAttendeeModal] = useState(false);
 
     return (
-        <Col lg="4" className="mx-auto text-center">
+        <Col lg="8">
             <>
                 <Card className="mb-4">
                     <Card.Header className="d-flex justify-content-between align-items-center">
@@ -470,7 +471,7 @@ const DynamicAttendeeForm = (props) => {
                     </Card.Footer>
                 )} */}
             </>
-            {!isMobile && <Button disabled={disable} onClick={()=>setIsProceed(true)}>Proceed</Button>}
+            {/* {!isMobile && <Button disabled={disable} onClick={()=>setIsProceed(true)}>Proceed</Button>} */}
         </Col>
     );
 };

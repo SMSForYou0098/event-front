@@ -19,7 +19,7 @@ const BookingTickets = (props) => {
     } = props
     const {formatDateRange} = useMyContext()
     return (
-        <Col lg="4" className="mx-auto text-center">
+        <Col lg="8" className="mx-auto text-center">
             {error &&
                 <Alert variant="danger d-flex gap-2 align-items-center" role="alert">
                     <AlertCircle />  {error}

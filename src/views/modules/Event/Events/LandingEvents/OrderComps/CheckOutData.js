@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Row } from 'react-bootstrap';
 import BookingTickets from './BookingProcess.js/BookingTickets';
 import BookingSummary from './BookingProcess.js/BookingSummary';
@@ -9,56 +9,49 @@ const CheckOutData = (props) => {
     return (
         <div id="checkout" className={`iq-product-tracker-card b-0 ${currentStep === 'checkout' ? 'show' : ''}`}>
             <Row>
-                {attendeeState && !isProceed ?
-                    <DynamicAttendeeForm
-                        showAttendeeSuggetion={event?.online_att_sug === 0}
-                        isAgent={false}
-                        getAttendees={getAttendees}
-                        category_id={categoryData?.categoryData?.id}
-                        setDisable={setDisable}
-                        disable={disable}
-                        AttendyView={AttendyView}
-                        event={event}
-                        setAttendees={setAttendees}
-                        apiData={categoryData?.customFieldsData}
-                        setAttendeeState={setAttendeeState}
-                        selectedTickets={selectedTickets}
-                        quantity={selectedTickets?.quantity}
-                        setIsProceed={setIsProceed}
-                    />
-                    :
-                    parseInt(event?.ticket_system) === 1 ?
-                        <UserSeatingCanvas
-                            bookingdate={bookingdate}
-                            error={error}
-                            event={event}
-                            isMobile={isMobile}
-                            resetCounterTrigger={resetCounterTrigger}
-                            getTicketCount={getTicketCount}
-                            selectedTickets={selectedTickets}
-                            getCurrencySymbol={getCurrencySymbol}
-                        />
-                        :
-                        (
-          !isProceed && (
-            <BookingTickets
-              event={event}
-              tickets={tickets}
-              bookingdate={bookingdate}
-              error={error}
-              isMobile={isMobile}
-              resetCounterTrigger={resetCounterTrigger}
-              getTicketCount={getTicketCount}
-              selectedTickets={selectedTickets}
-              getCurrencySymbol={getCurrencySymbol}
-            />
-          )
-        )}
-
-                    
-
-            </Row>
-            <Row>
+                {(!isMobile || !isProceed) && (
+  attendeeState ? (
+    <DynamicAttendeeForm
+      showAttendeeSuggetion={event?.online_att_sug === 0}
+      isAgent={false}
+      getAttendees={getAttendees}
+      category_id={categoryData?.categoryData?.id}
+      setDisable={setDisable}
+      disable={disable}
+      AttendyView={AttendyView}
+      event={event}
+      setAttendees={setAttendees}
+      apiData={categoryData?.customFieldsData}
+      setAttendeeState={setAttendeeState}
+      selectedTickets={selectedTickets}
+      quantity={selectedTickets?.quantity}
+      setIsProceed={setIsProceed}
+    />
+  ) : parseInt(event?.ticket_system) === 1 ? (
+    <UserSeatingCanvas
+      bookingdate={bookingdate}
+      error={error}
+      event={event}
+      isMobile={isMobile}
+      resetCounterTrigger={resetCounterTrigger}
+      getTicketCount={getTicketCount}
+      selectedTickets={selectedTickets}
+      getCurrencySymbol={getCurrencySymbol}
+    />
+  ) : (
+    <BookingTickets
+      event={event}
+      tickets={tickets}
+      bookingdate={bookingdate}
+      error={error}
+      isMobile={isMobile}
+      resetCounterTrigger={resetCounterTrigger}
+      getTicketCount={getTicketCount}
+      selectedTickets={selectedTickets}
+      getCurrencySymbol={getCurrencySymbol}
+    />
+  )
+)}
 
 
                 <BookingSummary
@@ -82,7 +75,6 @@ const CheckOutData = (props) => {
                     grandTotal={grandTotal}
                     isMobile={isMobile}
                     handlePayment={handlePayment}
-                    ticketCount={selectedTickets?.quantity}
                 />
             </Row>
         </div>
