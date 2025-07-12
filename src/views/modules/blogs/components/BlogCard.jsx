@@ -40,7 +40,7 @@ const BlogCard = ({ post }) => {
       </div>
 
       {/* Body */}
-      <Card.Body className="p-4">
+      <Card.Body style={{padding:"1rem",height:'auto'}} className="">
         <Card.Title className="fs-5 fw-bold mb-2">{post?.title}</Card.Title>
         <div className="d-flex flex-column text-muted small gap-1">
           <div className="d-flex align-items-center">

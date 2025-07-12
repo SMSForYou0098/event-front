@@ -38,11 +38,64 @@ const IDCardDragAndDrop = ({
   const [showIntroAnimation, setShowIntroAnimation] = useState(animate);
   const [animationComplete, setAnimationComplete] = useState(!animate);
   const { authToken, ErrorAlert, api, isMobile } = useMyContext();
-  
-  // Fetch layout from API
- // Fixed canvas dimensions
+
   const CANVAS_WIDTH = 204;
   const CANVAS_HEIGHT = 321;
+
+  const containerStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1.5rem',
+    maxWidth: '100%'
+  };
+
+  // Action buttons container
+  const actionButtonsStyle = {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '0.75rem',
+    justifyContent: 'center',
+    ...(isMobile && {
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: '0.5rem'
+    })
+  };
+
+  // Button group styles
+  const buttonGroupStyle = {
+    display: 'flex',
+    gap: '0.75rem',
+    ...(isMobile && {
+      width: '70%',
+      justifyContent: 'space-between'
+    })
+  };
+
+  // Canvas container styles
+  const canvasContainerStyle = {
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center'
+  };
+
+  // Canvas wrapper styles
+  const canvasWrapperStyle = {
+    maxWidth: '100%',
+    overflow: 'auto'
+  };
+
+  // Loading state styles
+  const loadingStyle = {
+    minHeight: '300px',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+    padding: '3rem 0',
+    width: '100%'
+  };
   const saveLayoutToBackend = async (layoutData) => {
   try {
     setLoading(true);
@@ -1661,7 +1714,7 @@ values.forEach((text, i) => {
 
       // Download completed successfully
     } catch (err) {
-      alert("Download failed. Please try again.");
+      // alert("Download failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -1748,94 +1801,86 @@ values.forEach((text, i) => {
   }
 
   return (
-    <>
-      <div className="d-flex gap-2 mb-3 justify-content-end flex-wrap">
-  {isEdit && (
-    <>
-      <Button
-        variant="outline-secondary"
-        onClick={resetElementPositions}
-        disabled={!canvasReady || loading}
-        className="d-flex align-items-center gap-2"
-        title="Reset all elements to default positions"
-      >
-        Reset
-        <RotateCcw size={16} />
-      </Button>
-      <Button
-        variant="primary"
-        onClick={() => saveLayoutToBackend(elementPositions)}
-        disabled={!canvasReady || loading}
-        className="d-flex align-items-center gap-2"
-      >
-        {loading ? "Saving..." : "Save Layout"}
-        <Save size={16} />
-      </Button>
-    </>
-  )}
-  {download && (
-    <Button
-      variant="primary"
-      onClick={downloadCanvas}
-      disabled={!canvasReady || loading}
-      className="d-flex align-items-center gap-2"
-      title="Download ID Card in 4K quality"
-    >
-      {loading ? "Please Wait..." : "Download"}
-      <ArrowBigDownDash size={16} />
-    </Button>
-  )}
-  {print && (
-    <Button
-      variant="secondary"
-      onClick={printCanvas}
-      disabled={!canvasReady || loading}
-      className="d-flex align-items-center gap-2"
-    >
-      Print
-      <Printer size={16} />
-    </Button>
-  )}
-</div>
+    <div style={containerStyle}>
+      {/* Action Buttons */}
+      <div style={actionButtonsStyle}>
+        {isEdit && (
+          <div style={buttonGroupStyle}>
+            <Button
+              variant="outline-secondary"
+              onClick={resetElementPositions}
+              disabled={!canvasReady || loading}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+              title="Reset all elements to default positions"
+              size={isMobile ? 'sm' : undefined}
+            >
+              {!isMobile && 'Reset'}
+              <RotateCcw size={isMobile ? 14 : 16} />
+            </Button>
+            <Button
+              variant="primary"
+              onClick={() => saveLayoutToBackend(elementPositions)}
+              disabled={!canvasReady || loading}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+              size={isMobile ? 'sm' : undefined}
+            >
+              {loading ? "Saving..." : (!isMobile && "Save Layout")}
+              <Save size={isMobile ? 14 : 16} />
+            </Button>
+          </div>
+        )}
+        
+        <div style={buttonGroupStyle}>
+          {download && (
+            <Button
+              variant="primary"
+              onClick={downloadCanvas}
+              disabled={!canvasReady || loading}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+              title="Download ID Card in 4K quality"
+              size={isMobile ? 'sm' : undefined}
+            >
+              {loading ? "Wait..." : (!isMobile && "Download")}
+              <ArrowBigDownDash size={isMobile ? 14 : 16} />
+            </Button>
+          )}
+          {print && (
+            <Button
+              variant="secondary"
+              onClick={printCanvas}
+              disabled={!canvasReady || loading}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+              size={isMobile ? 'sm' : undefined}
+            >
+              {!isMobile && 'Print'}
+              <Printer size={isMobile ? 14 : 16} />
+            </Button>
+          )}
+        </div>
+      </div>
 
-<div
-  style={{
-    display: "flex",
-    justifyContent: "center",
-    overflowX: "auto",
-    position: "relative",
-  }}
->
-  {finalImage && userData ? (
-    <div
-      style={{
-        border: "1px solid #ddd",
-        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-        borderRadius: "12px",
-        overflow: "hidden",
-transform: !isEdit
-  ? isMobile
-    ? "scale(0.5)"
-    : "scale(0.75)"
-  : "none",
-        transformOrigin: "top center", // ✅ Important: scale from top center
-      }}
-    >
-      <canvas ref={canvasRef} style={{ display: "block" }} />
+      {/* Canvas Container */}
+      <div style={canvasContainerStyle}>
+        {finalImage && userData ? (
+          <div style={canvasWrapperStyle}>
+            <canvas 
+              ref={canvasRef} 
+              style={{ maxWidth: '100%', height: 'auto' }} 
+            />
+          </div>
+        ) : (
+          <div style={loadingStyle}>
+            <Spinner animation="border" role="status" />
+            <p style={{ marginTop: '0.5rem' }}>Loading ID Card...</p>
+          </div>
+        )}
+      </div>
+
+      {/* Hidden QR Code */}
+      <div style={{ display: "none" }}>
+        <QRCodeCanvas ref={qrCodeRef} value={orderId} size={150 * 3} />
+      </div>
     </div>
-  ) : (
-    <div className="text-center py-5 w-100">
-      <Spinner animation="border" role="status" />
-      <p className="mt-2">Loading ID Card...</p>
-    </div>
-  )}
-</div>
-
-<div style={{ display: "none" }}>
-  <QRCodeCanvas ref={qrCodeRef} value={orderId} size={150 * 3} />
-</div>
-
-    </>
   );
 };
 

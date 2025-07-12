@@ -91,23 +91,14 @@ const CommentsSection = ({ comments = [], id, refreshComments, loading }) => {
       <Card.Body>
         <div className="d-flex gap-3">
           <div className="flex-shrink-0">
-            {userPhoto ? (
-              <Image
-                src={userPhoto}
-                roundedCircle
-                width={50}
-                height={50}
-                alt={userName}
-                className="object-fit-cover border border-primary"
-              />
-            ) : (
+
               <div
                 className="d-flex align-items-center justify-content-center rounded-circle bg-primary text-white"
                 style={{ width: 50, height: 50, fontWeight: '600', fontSize: '1.2rem' }}
               >
                 {getInitials(userName)}
               </div>
-            )}
+            
           </div>
           <div className="flex-grow-1">
             <div className="d-flex justify-content-between align-items-start">

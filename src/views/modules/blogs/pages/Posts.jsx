@@ -4,10 +4,7 @@ import {
   Button,
   Container,
   Spinner,
-  Alert,
-  Placeholder,
-  InputGroup,
-  Form
+  Alert
 } from 'react-bootstrap';
 import axios from 'axios';
 import { useMyContext } from '../../../../Context/MyContextProvider';
@@ -16,7 +13,9 @@ import { Edit2, Trash2 } from 'lucide-react';
 import Swal from 'sweetalert2';
 import PaginationComponent from '../components/PaginationComponent';
 import PostTableSkeletons from '../components/skeletons/PostTableSkeletons';
-// import SearchControl from './SearchControl';
+import BlogDashboardFilters from '../components/dashboards/BlogDashboardFilters';
+import { filter } from 'lodash';
+import { useDebounce } from './Dashboard';
 
 const Posts = () => {
   const { authToken, api } = useMyContext();
@@ -24,11 +23,16 @@ const Posts = () => {
 
   const [posts, setPosts] = useState([]);
   const [filteredPosts, setFilteredPosts] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [filters, setFilters] = useState({
+    title: '',
+    status: 'all',
+    date: ''
+  });
+  const debouncedTitle = useDebounce(filters.title, 400);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 10;
 
@@ -72,8 +76,6 @@ const Posts = () => {
 
         const updated = posts.filter((post) => post.id !== id);
         setPosts(updated);
-        handleSearch(searchTerm, updated);
-
         Swal.fire({
           icon: 'success',
           title: 'Deleted!',
@@ -88,14 +90,33 @@ const Posts = () => {
     }
   };
 
-  const handleSearch = (term, data = posts) => {
-    setSearchTerm(term);
-    const filtered = data.filter((post) =>
-      post.title.toLowerCase().includes(term.toLowerCase())
-    );
-    setFilteredPosts(filtered);
-    setCurrentPage(1); // Reset to first page on search
-  };
+useEffect(() => {
+  const filtered = posts.filter((post) => {
+    const titleMatch = post.title.toLowerCase().includes(debouncedTitle.toLowerCase());
+    const statusMatch =
+      filters.status === 'all' || String(post.status) === filters.status;
+
+    let dateMatch = true;
+
+    if (filters.date) {
+      const [startStr, endStr] = filters.date.split(',');
+      const start = startStr ? new Date(startStr) : null;
+      const end = endStr ? new Date(endStr) : null;
+      const createdAt = new Date(post.created_at);
+
+      dateMatch =
+        (!start || createdAt >= start) &&
+        (!end || createdAt <= new Date(end.getFullYear(), end.getMonth(), end.getDate(), 23, 59, 59));
+    }
+
+    return titleMatch && statusMatch && dateMatch;
+  });
+
+  setFilteredPosts(filtered);
+  setCurrentPage(1);
+}, [debouncedTitle, filters.status, filters.date, posts]);
+
+
 
   const paginate = (items) => {
     const start = (currentPage - 1) * postsPerPage;
@@ -117,19 +138,7 @@ const Posts = () => {
         </Button>
       </div>
 
-      <div className="d-flex justify-content-end mb-3">
-        <InputGroup style={{ width: '300px' }}>
-          <Form.Control
-            type="text"
-            placeholder="Search by title..."
-            value={searchTerm}
-            onChange={(e) => handleSearch(e.target.value)}
-          />
-          <InputGroup.Text>
-            <i className="bi bi-search"></i>
-          </InputGroup.Text>
-        </InputGroup>
-      </div>
+      <BlogDashboardFilters filters={filters} setFilters={setFilters} />
 
       {error ? (
         <Alert variant="danger">{error}</Alert>
@@ -167,7 +176,12 @@ const Posts = () => {
                       <img
                         src={post.thumbnail}
                         alt="thumbnail"
-                        style={{ height: '60px', width: '100px', objectFit: 'cover', borderRadius: '4px' }}
+                        style={{
+                          height: '60px',
+                          width: '100px',
+                          objectFit: 'cover',
+                          borderRadius: '4px',
+                        }}
                       />
                     </td>
                     <td>{post?.user_data?.name}</td>
@@ -195,7 +209,7 @@ const Posts = () => {
               )}
             </tbody>
           </Table>
-          
+
           {!loading && filteredPosts.length > 0 && (
             <PaginationComponent
               currentPage={currentPage}

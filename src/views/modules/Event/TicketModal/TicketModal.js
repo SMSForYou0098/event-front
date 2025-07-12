@@ -7,7 +7,6 @@ import { useMyContext } from '../../../../Context/MyContextProvider';
 import AmusementTicket from '../Events/Tickets/AmusementTicket';
 import AccreditationTicket from '../Events/Tickets/AccreditationTicket';
 import TicketCanvasBatch from '../Events/Tickets/TicketCanvasBatch';
-import IdCard from '../Events/Tickets/IdCard';
 import axios from 'axios';
 import IDCardDragAndDrop from '../CustomUtils/IDCardDragAndDrop';
 
@@ -160,7 +159,7 @@ const TicketModal = (props) => {
                                 </Swiper>
                             )
                         ) : ticketType?.type === 'combine' ? (
-                            <div style={{height:"580px"}}>
+                            <div style={{height:"auto"}}>
                                 <Col lg={12} md={12} xl={12}>
                                     <div>
                                         {/* Safely extract data with fallback values */}

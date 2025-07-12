@@ -18,6 +18,7 @@ const Sumary = ({
     apiData,
     attendeeList
 }) => {
+    console.log('selectedT',attendeeList)
     const handleDownloadClick = () => {
         Swal.fire({
             title: 'Download Ticket',
@@ -86,7 +87,7 @@ const Sumary = ({
                                                             // Group items that should appear on the same line
                                                             [
                                                                 { icon: <Clock size={16} />, label: "Time", value: convertTo12HourFormat(event?.start_time) },
-                                                                { icon: <BriefcaseBusiness size={16} />, label: "Ticket QTY", value: selectedTickets?.quantity || 1 }
+                                                                { icon: <BriefcaseBusiness size={16} />, label: "Ticket QTY", value: selectedTickets?.quantity || attendeeList.length || 1 }
                                                             ],
                                                             [
                                                                 { icon: <Ticket size={16} />, label: "Type", value: selectedTickets?.category },

@@ -2,12 +2,12 @@ import BlogsLayout from '../layouts/BlogsLayout';
 import HomePage from '../pages/HomePage';
 import BlogPost from '../components/BlogPost';
 import BlogsDashboardLayout from '../layouts/BlogsDashboardLayout';
-import Dashboard from '../dashboard/Dashboard';
-import Posts from '../dashboard/Posts';
+import Dashboard from '../pages/Dashboard';
+import Posts from '../pages/Posts';
 import DefaultLayout from '../../Event/layouts/default-layout';
-import NewPost from '../dashboard/NewPost';
+import NewPost from '../pages/NewPost';
 import ProtectedRoutesForBlog from '../../../../router/ProtectedRouts/ProtectedRoutesForBlog';
-import EditPost from '../dashboard/EditPost';
+import EditPost from '../pages/EditPost';
 import PostPage from '../pages/PostPage';
 
 export const BlogsRouter = [

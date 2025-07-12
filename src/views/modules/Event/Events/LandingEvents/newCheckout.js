@@ -667,7 +667,7 @@ const NewChekout = memo(() => {
                         return false;
                     }
                     if (response.data?.result?.status === 1 || response.data?.result?.success) {
-                        setAllAttendees([]);
+                        // setAllAttendees([]);
                         const sessionData = {
                             session_id: response.data.txnid,
                             selectedTickets: selectedTickets,
@@ -692,7 +692,8 @@ const NewChekout = memo(() => {
         } catch (error) {
             const err = error.response?.data?.message || error.response?.data?.error || error.message || 'An error occurred while initiating payment.';
             setError(err);
-        } finally {
+        }
+         finally {
             setSelectedTickets(null);
             setLoading(false); // Reset loading state regardless of success/failure
         }

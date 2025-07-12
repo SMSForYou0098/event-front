@@ -6,7 +6,7 @@ import { ToastContainer } from 'react-toastify';
 
 const BlogsDashboardLayout = () => (
   <div>
-    {/* <CustomNavbar /> */}
+    <CustomNavbar />
     <div style={{ display: 'flex' }}>
       <ToastContainer />
       <Sidebar />

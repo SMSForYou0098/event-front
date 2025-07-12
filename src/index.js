@@ -11,6 +11,7 @@ import Home from "./views/modules/Event/Home/Home";
 import DefaultLayout from "./views/modules/Event/layouts/default-layout";
 import { LandingModulesRouter } from "./views/modules/Event/CutomRoutes/landing-modules-router";
 import { BlogsRouter } from "./views/modules/blogs/router/BlogsRouter";
+import UserCard from "./views/modules/Event/User/UserCard";
 const router = createBrowserRouter(
   [
     {
@@ -20,12 +21,16 @@ const router = createBrowserRouter(
         {
           path: "",
           element: <Home />,
-        }
+        },
       ]
     },
     ...BlogsRouter,
     ...IndexRouters,
-    ...LandingModulesRouter
+    ...LandingModulesRouter,
+     {
+    path: '/token/:orderId',
+    element: <UserCard />
+  },
   ],
   { basename: process.env.PUBLIC_URL }
 );
